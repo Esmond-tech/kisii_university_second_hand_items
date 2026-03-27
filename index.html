@@ -344,19 +344,16 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo">KISII UNI<br><span>SECOND-HAND</span></div>
   <span class="nav-badge">🇰🇪 Bei Poa • Good Deals</span>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <h1>Vitu Poa, Bei Nafuu 🔥</h1>
   <p>Second-hand items kwa bei ya chini. <em>Students only vibes.</em></p>
 </div>
 
-<!-- SEARCH -->
 <div class="search-wrap">
   <div class="search-inner">
     <input type="text" id="searchInput" placeholder="Tafuta kitu... e.g. phone, gas, jeans" oninput="filterItems()"/>
@@ -364,32 +361,24 @@
   </div>
 </div>
 
-<!-- CATEGORIES -->
 <div class="categories-section">
   <div class="section-label">Categories</div>
   <div class="categories-scroll" id="categoriesContainer">
-    <!-- populated by JS -->
-  </div>
+    </div>
 </div>
 
-<!-- ITEMS -->
 <div class="items-section">
   <div class="items-header">
     <div class="section-label">Available Items</div>
     <div class="items-count" id="itemsCount"></div>
   </div>
   <div class="items-grid" id="itemsGrid">
-    <!-- populated by JS -->
-  </div>
+    </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <strong>Kisii University Second-Hand Items</strong> &nbsp;•&nbsp; Biashara halisi, bei ya wanafunzi 🇰🇪
 </footer>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -410,7 +399,6 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
-const categoriesRef = db.ref('categories');
 
 // ── CATEGORY EMOJIS ──
 const catEmoji = {
@@ -424,32 +412,23 @@ const catEmoji = {
 
 function getEmoji(cat) {
   for (const key in catEmoji) {
-    if (cat && cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
+    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
   }
   return catEmoji.default;
 }
 
 let activeCategory = 'All';
 
-// ── Render Categories (Now from Firebase) ──
-function renderCategories(cats) {
-  const allCats = ['All', ...cats];
+// ── Render Categories ──
+function renderCategories() {
+  const cats = ['All', 'Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
   const container = document.getElementById('categoriesContainer');
   
-  container.innerHTML = allCats.map(cat => `
-    <div class="cat-chip ${cat === activeCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
-      <span class="emoji">${cat === 'All' ? '🛒' : getEmoji(cat)}</span> ${cat}
+  container.innerHTML = cats.map(cat => `
+    <div class="cat-chip ${activeCategory === cat ? 'active' : ''}" onclick="setCategory('${cat}')">
+      <span class="emoji">${cat === 'All' ? '✨' : getEmoji(cat)}</span> ${cat}
     </div>
   `).join('');
-}
-
-// ── Load Categories from Firebase ──
-function loadCategories(callback) {
-  categoriesRef.once('value', (snapshot) => {
-    let cats = snapshot.val() || ['Electronics', 'Clothes & Shoes', 'Furniture'];
-    if (!Array.isArray(cats)) cats = ['Electronics', 'Clothes & Shoes', 'Furniture'];
-    callback(cats);
-  });
 }
 
 // ── Load and Render Items ──
@@ -464,16 +443,16 @@ function loadAndRenderItems() {
       items.push(child.val());
     });
 
-    // Filter by active category
+    // Filter by Category
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
     }
-
-    // Search filter
+    
+    // Filter by Search Query
     if (query) {
       items = items.filter(i => 
-        (i.name && i.name.toLowerCase().includes(query)) ||
-        (i.category && i.category.toLowerCase().includes(query))
+        i.name.toLowerCase().includes(query) || 
+        i.category.toLowerCase().includes(query)
       );
     }
 
@@ -491,13 +470,18 @@ function loadAndRenderItems() {
 
     grid.innerHTML = items.map((item, idx) => `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${item.image ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
-        <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">${getEmoji(item.category)}</div>
+        ${item.image ? 
+          `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : 
+          ''}
+        <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">
+          ${getEmoji(item.category)}
+        </div>
+        
         <div class="item-body">
-          <div class="item-category">${item.category || 'Uncategorized'}</div>
+          <div class="item-category">${item.category}</div>
           <div class="item-name">${item.name}</div>
-          <div class="item-price">KSh ${Number(item.price || 0).toLocaleString()}<span>negotiable</span></div>
-          <a class="contact-btn" href="https://wa.me/254${(item.phone || '').replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name || '')}" target="_blank">
+          <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
+          <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
             📲 Wasiliana na Seller
           </a>
         </div>
@@ -508,23 +492,23 @@ function loadAndRenderItems() {
 
 function setCategory(cat) {
   activeCategory = cat;
-  loadCategories((cats) => {
-    renderCategories(cats);
-    loadAndRenderItems();
-  });
+  renderCategories();
+  loadAndRenderItems();
 }
 
-// Real-time listener for items
-itemsRef.on('value', loadAndRenderItems);
+// Filter on search input
+function filterItems() {
+  loadAndRenderItems();
+}
 
-// Search
-document.getElementById('searchInput').addEventListener('input', loadAndRenderItems);
-
-// Initial load
-loadCategories((cats) => {
-  renderCategories(cats);
+// Real-time updates
+itemsRef.on('value', () => {
   loadAndRenderItems();
 });
+
+// Initial load
+renderCategories();
+loadAndRenderItems();
 </script>
 </body>
 </html>
