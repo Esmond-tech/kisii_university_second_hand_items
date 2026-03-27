@@ -151,19 +151,9 @@
     background: #fafafa;
   }
 
-  .image-upload-area:hover,
-  .image-upload-area.drag-over {
+  .image-upload-area:hover {
     border-color: var(--green);
     background: #f0faf4;
-  }
-
-  .image-upload-area input[type=file] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
   }
 
   .upload-placeholder {
@@ -319,37 +309,6 @@
 
   .admin-item-price { font-weight: 700; color: var(--red); font-size: 0.93rem; white-space: nowrap; }
 
-  /* ── CATEGORIES MANAGE ── */
-  .cat-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-
-  .cat-tag {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--grey);
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .cat-tag .remove-cat {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--red);
-    font-size: 1rem;
-    line-height: 1;
-    padding: 0;
-    margin-left: 2px;
-  }
-
-  .cat-tag.fixed { opacity: 0.6; }
-  .cat-tag.fixed .remove-cat { display: none; }
-
-  .add-cat-row { display: flex; gap: 8px; }
-  .add-cat-row input { flex: 1; }
-
   /* ── STATS BAR ── */
   .stats-bar {
     display: grid;
@@ -375,7 +334,6 @@
 
   .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
-  /* ── LINK TO SITE ── */
   .site-link-bar {
     background: var(--green);
     color: white;
@@ -389,7 +347,6 @@
     gap: 10px;
   }
 
-  .site-link-bar span { font-size: 0.9rem; }
   .site-link-bar a {
     color: var(--yellow);
     font-weight: 700;
@@ -406,22 +363,10 @@
 
   .empty-msg .e { font-size: 2rem; margin-bottom: 8px; }
 
-  /* ── IMAGE SIZE WARNING ── */
-  .size-warning {
-    display: none;
-    font-size: 0.78rem;
-    color: #e67e22;
-    margin-top: 6px;
-    background: #fff8f0;
-    border: 1px solid #f5cba7;
-    border-radius: 6px;
-    padding: 6px 10px;
-  }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="logo">KISII UNI<br><span>ADMIN PANEL</span></div>
   <span class="admin-badge">🔐 Owner Access</span>
@@ -430,15 +375,13 @@
 <div class="page-wrap">
 
   <div class="page-title">🛠️ Manage Biashara</div>
-  <div class="page-sub">Add items, remove sold items, manage categories. Wewe peke yako unaona ukurasa huu.</div>
+  <div class="page-sub">Add items, remove sold items, and manage listings.</div>
 
-  <!-- LINK TO CUSTOMER PAGE -->
   <div class="site-link-bar">
     <span>👁️ Customer page:</span>
     <a href="index.html" target="_blank">index.html → View Customer Site ↗</a>
   </div>
 
-  <!-- STATS -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="stat-number" id="statItems">0</div>
@@ -455,13 +398,11 @@
   </div>
 
   <div class="grid-two">
-
-    <!-- ADD ITEM FORM -->
     <div class="card">
       <div class="card-title">➕ Ongeza Item Mpya</div>
 
       <div class="field">
-        <label>Item Name / Jina la bidhaa</label>
+        <label>Item Name</label>
         <input type="text" id="iName" placeholder="e.g. Samsung Galaxy A14"/>
       </div>
 
@@ -476,81 +417,54 @@
       </div>
 
       <div class="field">
-        <label>Seller Phone / WhatsApp</label>
+        <label>Seller Phone</label>
         <input type="text" id="iPhone" placeholder="e.g. 0712345678"/>
       </div>
 
-      <!-- ── IMAGE UPLOAD ── -->
       <div class="field">
-        <label>📸 Picha ya Bidhaa (optional)</label>
-
-        <!-- Upload area (shown when no image) -->
-        <div class="image-upload-area" id="uploadArea">
-          <input type="file" id="iImageFile" accept="image/*" onchange="handleImageUpload(event)"/>
+        <label>📸 Picha ya Bidhaa</label>
+        <div class="image-upload-area" id="uploadArea" onclick="openCloudinaryWidget()">
           <div class="upload-placeholder">
             <span class="upload-icon">🖼️</span>
-            <span class="upload-text">Bonyeza hapa au drag & drop picha</span>
-            <span class="upload-hint">JPG, PNG, WEBP — max 5MB recommended</span>
+            <span class="upload-text">Bonyeza hapa ku-upload picha</span>
+            <span class="upload-hint">Powered by Cloudinary</span>
           </div>
         </div>
 
-        <!-- Preview (shown when image selected) -->
         <div class="image-preview-wrap" id="previewWrap">
           <img id="previewImg" src="" alt="Preview"/>
-          <button class="remove-preview-btn" onclick="removeImage()" title="Remove image">✕</button>
+          <button class="remove-preview-btn" onclick="removeImage()">✕</button>
         </div>
-
-        <div class="size-warning" id="sizeWarning">
-          ⚠️ Picha ni kubwa sana (zaidi ya 2MB). Inaweza kufanya storage ijae haraka. Tumia picha ndogo kwa matokeo bora.
-        </div>
-        <div class="upload-progress" id="uploadProgress">⏳ Inapakua picha...</div>
       </div>
 
       <button class="btn btn-green" onclick="addItem()">✅ Ongeza Item</button>
     </div>
 
-    <!-- CATEGORIES MANAGER -->
-    <div>
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-title">🏷️ Manage Categories</div>
-        <div class="cat-list" id="catList"></div>
-        <div class="add-cat-row">
-          <input type="text" id="newCatInput" placeholder="New category name..." onkeydown="if(event.key==='Enter')addCategory()"/>
-          <button class="btn btn-yellow" onclick="addCategory()">Add</button>
-        </div>
-      </div>
-
-      <!-- QUICK TIPS CARD -->
-      <div class="card">
+    <div class="card">
         <div class="card-title">📊 Quick Tips</div>
         <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
-          • Bookmark this page — it's your secret admin link<br>
-          • 📸 Upload picha moja kwa kila item kwa clarity<br>
-          • Compress images to under 1MB for faster loading<br>
-          • Remove items immediately after selling<br>
-          • Use WhatsApp number format: 07XXXXXXXX<br>
-          • Images zinawekwa kwenye browser — clear cache = zinaenda
+          • Images are hosted on Cloudinary for free<br>
+          • 40,000 visitors per month supported via Cloudflare<br>
+          • Always remove sold items to keep the list fresh.
         </p>
       </div>
-    </div>
   </div>
 
-  <!-- ITEMS LIST -->
   <div class="card" style="margin-top:24px">
-    <div class="card-title">📦 All Listed Items <span style="font-size:0.8rem;font-weight:500;color:var(--muted)" id="listedCount"></span></div>
+    <div class="card-title">📦 All Listed Items <span id="listedCount"></span></div>
     <div class="items-list" id="adminItemsList"></div>
   </div>
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
 
 <script>
-// ── Firebase Setup ──
+// ── Firebase Configuration ──
 const firebaseConfig = {
   apiKey: "AIzaSyBq42vxsEor4XQTQ0LnXhqR-SkxLWx5ZpA",
   authDomain: "kisii-uni-shop-a86e4.firebaseapp.com",
@@ -558,32 +472,25 @@ const firebaseConfig = {
   projectId: "kisii-uni-shop-a86e4",
   storageBucket: "kisii-uni-shop-a86e4.firebasestorage.app",
   messagingSenderId: "213271249826",
-  appId: "1:213271249826:web:f663db95894550c79168fb",
-  measurementId: "G-X55E79ZEJ9"
+  appId: "1:213271249826:web:f663db95894550c79168fb"
 };
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
-const categoriesRef = db.ref('categories');
 
-// ── Helpers ──
-const FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture'];
+// ── Cloudinary Config ──
+const cloudName = "df9ulrvka"; 
+const uploadPreset = "kisii_preset"; 
 
-const catEmoji = {
-  'Electronics': '📱',
-  'Clothes & Shoes': '👟',
-  'Furniture': '🛋️',
-  'Books': '📚',
-  'Kitchen': '🍳',
-  'default': '📦'
-};
+let currentImageUrl = '';
+
+// ── UI Helpers ──
+const FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
+const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
-  for (const key in catEmoji) {
-    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
-  }
-  return catEmoji.default;
+  return catEmoji[cat] || catEmoji.default;
 }
 
 function toast(msg, isError = false) {
@@ -594,84 +501,40 @@ function toast(msg, isError = false) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── IMAGE HANDLING ──
-let currentImageBase64 = '';
-
-function handleImageUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const progress = document.getElementById('uploadProgress');
-  const warning = document.getElementById('sizeWarning');
-
-  if (file.size > 2 * 1024 * 1024) {
-    warning.style.display = 'block';
-  } else {
-    warning.style.display = 'none';
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    toast('⚠️ Picha ni kubwa mno! Max 5MB.', true);
-    event.target.value = '';
-    return;
-  }
-
-  progress.style.display = 'block';
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    currentImageBase64 = e.target.result;
-    document.getElementById('previewImg').src = currentImageBase64;
-    document.getElementById('previewWrap').classList.add('has-image');
-    document.getElementById('uploadArea').classList.add('hidden');
-    progress.style.display = 'none';
-  };
-  reader.onerror = function() {
-    toast('❌ Hitilafu ya kupakua picha. Jaribu tena.', true);
-    progress.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+// ── Cloudinary Upload Widget ──
+function openCloudinaryWidget() {
+  cloudinary.openUploadWidget({
+    cloudName: cloudName,
+    uploadPreset: uploadPreset,
+    sources: ['local', 'camera'],
+    multiple: false,
+    clientAllowedFormats: ["png", "jpg", "jpeg", "webp"]
+  }, (error, result) => {
+    if (!error && result && result.event === "success") {
+      currentImageUrl = result.info.secure_url;
+      document.getElementById('previewImg').src = currentImageUrl;
+      document.getElementById('previewWrap').classList.add('has-image');
+      document.getElementById('uploadArea').classList.add('hidden');
+      toast('✅ Picha imepakiwa!');
+    }
+  });
 }
 
 function removeImage() {
-  currentImageBase64 = '';
-  document.getElementById('previewImg').src = '';
+  currentImageUrl = '';
   document.getElementById('previewWrap').classList.remove('has-image');
   document.getElementById('uploadArea').classList.remove('hidden');
-  document.getElementById('iImageFile').value = '';
-  document.getElementById('sizeWarning').style.display = 'none';
 }
 
-// Drag & drop support
-const uploadArea = document.getElementById('uploadArea');
-uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    document.getElementById('iImageFile').files = dt.files;
-    handleImageUpload({ target: { files: [file] } });
-  } else {
-    toast('⚠️ Faili hii si picha.', true);
-  }
-});
-
-// ── ADD ITEM ──
+// ── Add Item ──
 function addItem() {
   const name = document.getElementById('iName').value.trim();
   const category = document.getElementById('iCategory').value;
   const price = document.getElementById('iPrice').value.trim();
   const phone = document.getElementById('iPhone').value.trim();
 
-  if (!name || !category || !price || !phone) {
-    toast('⚠️ Jaza sehemu zote muhimu!', true); return;
-  }
-  if (!/^0[0-9]{9}$/.test(phone)) {
-    toast('⚠️ Nambari ya simu lazima iwe kama 07XXXXXXXX', true); return;
+  if (!name || !price || !phone) {
+    toast('⚠️ Jaza sehemu zote!', true); return;
   }
 
   const newItem = {
@@ -680,136 +543,58 @@ function addItem() {
     category,
     price: parseFloat(price),
     phone,
-    image: currentImageBase64 || '',
+    image: currentImageUrl,
     addedAt: new Date().toLocaleDateString('en-KE')
   };
 
-  itemsRef.push(newItem)
-    .then(() => {
-      toast('✅ Item imeongezwa successfully!');
-      document.getElementById('iName').value = '';
-      document.getElementById('iPrice').value = '';
-      document.getElementById('iPhone').value = '';
-      removeImage();
-      renderAll();
-    })
-    .catch(err => {
-      toast('❌ Hitilafu: ' + err.message, true);
-    });
+  itemsRef.push(newItem).then(() => {
+    toast('✅ Item added successfully!');
+    document.getElementById('iName').value = '';
+    document.getElementById('iPrice').value = '';
+    document.getElementById('iPhone').value = '';
+    removeImage();
+    renderAll();
+  });
 }
 
-// ── REMOVE ITEM ──
 function removeItem(key) {
-  if (!confirm('Una uhakika unataka kuondoa item hii?')) return;
-  itemsRef.child(key).remove()
-    .then(() => {
-      toast('🗑️ Item imeondolewa.');
+  if (confirm('Ondoa item hii?')) {
+    itemsRef.child(key).remove().then(() => {
+      toast('🗑️ Item removed.');
       renderAll();
     });
+  }
 }
 
-// ── CATEGORIES (Restored + Firebase) ──
-function loadCategories(callback) {
-  categoriesRef.once('value', (snapshot) => {
-    let cats = snapshot.val() || FIXED_CATS;
-    if (!Array.isArray(cats)) cats = FIXED_CATS;
-    callback(cats);
-  });
-}
-
-function saveCategories(cats) {
-  categoriesRef.set(cats);
-}
-
-function addCategory() {
-  const input = document.getElementById('newCatInput');
-  const val = input.value.trim();
-  if (!val) return;
-
-  loadCategories((cats) => {
-    if (cats.map(c => c.toLowerCase()).includes(val.toLowerCase())) {
-      toast('Category hii ipo tayari!', true); return;
-    }
-    cats.push(val);
-    saveCategories(cats);
-    input.value = '';
-    toast('✅ Category imeongezwa!');
-    renderAll();
-  });
-}
-
-function removeCategory(cat) {
-  if (FIXED_CATS.includes(cat)) return;
-  if (!confirm(`Ondoa category "${cat}"?`)) return;
-
-  loadCategories((cats) => {
-    const newCats = cats.filter(c => c !== cat);
-    saveCategories(newCats);
-    toast('🗑️ Category imeondolewa.');
-    renderAll();
-  });
-}
-
-// ── RENDER ALL ──
 function renderAll() {
-  loadCategories((cats) => {
-    // Stats (items)
-    itemsRef.once('value', (snapshot) => {
-      let items = [];
-      let keys = [];
-      snapshot.forEach(child => {
-        items.push(child.val());
-        keys.push(child.key);
-      });
-
-      document.getElementById('statItems').textContent = items.length;
-      const avg = items.length ? Math.round(items.reduce((s, i) => s + i.price, 0) / items.length) : 0;
-      document.getElementById('statPrice').textContent = avg.toLocaleString();
-      document.getElementById('statCats').textContent = cats.length;
-
-      // Category select
-      const sel = document.getElementById('iCategory');
-      sel.innerHTML = cats.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
-
-      // Category tags
-      document.getElementById('catList').innerHTML = cats.map(c => `
-        <div class="cat-tag ${FIXED_CATS.includes(c) ? 'fixed' : ''}">
-          ${getEmoji(c)} ${c}
-          <button class="remove-cat" onclick="removeCategory('${c}')" title="Remove">✕</button>
-        </div>
-      `).join('');
-
-      // Items list
-      const listEl = document.getElementById('adminItemsList');
-      document.getElementById('listedCount').textContent = `(${items.length} items)`;
-
-      if (items.length === 0) {
-        listEl.innerHTML = `<div class="empty-msg"><div class="e">📦</div>Bado hakuna items. Ongeza item ya kwanza!</div>`;
-        return;
-      }
-
-      listEl.innerHTML = items.map((item, idx) => {
-        const key = keys[idx];
-        return `
-          <div class="admin-item" style="animation-delay:${idx*0.04}s">
-            <div class="admin-item-img">
-              ${item.image 
-                ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='${getEmoji(item.category)}'"/>` 
-                : getEmoji(item.category)}
-            </div>
-            <div class="admin-item-info">
-              <div class="admin-item-name">${item.name}</div>
-              <div class="admin-item-meta">
-                ${item.category} • 📞 ${item.phone} • Added ${item.addedAt || '—'}
-                ${item.image ? ' • <span style="color:var(--green)">📸 Ina picha</span>' : ' • <span style="color:#aaa">Picha: —</span>'}
-              </div>
-            </div>
-            <div class="admin-item-price">KSh ${Number(item.price).toLocaleString()}</div>
-            <button class="btn btn-red btn-sm" onclick="removeItem('${key}')">🗑️ Sold/Remove</button>
-          </div>
-        `;
-      }).join('');
+  itemsRef.once('value', (snapshot) => {
+    let items = [];
+    let keys = [];
+    snapshot.forEach(child => {
+      items.push(child.val());
+      keys.push(child.key);
     });
+
+    document.getElementById('statItems').textContent = items.length;
+    document.getElementById('statCats').textContent = FIXED_CATS.length;
+    
+    const sel = document.getElementById('iCategory');
+    sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+
+    const listEl = document.getElementById('adminItemsList');
+    listEl.innerHTML = items.map((item, idx) => `
+      <div class="admin-item">
+        <div class="admin-item-img">
+          ${item.image ? `<img src="${item.image}"/>` : getEmoji(item.category)}
+        </div>
+        <div class="admin-item-info">
+          <div class="admin-item-name">${item.name}</div>
+          <div class="admin-item-meta">${item.category} • ${item.phone}</div>
+        </div>
+        <div class="admin-item-price">KSh ${item.price}</div>
+        <button class="btn btn-red btn-sm" onclick="removeItem('${keys[idx]}')">🗑️ Sold</button>
+      </div>
+    `).join('');
   });
 }
 
