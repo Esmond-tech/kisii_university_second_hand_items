@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin – Kisii Uni Second-Hand</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #1a7a3c;
+    --red: #c0392b;
+    --black: #111111;
+    --white: #fafaf8;
+    --yellow: #f5c518;
+    --grey: #f2f2f0;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0dc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--grey);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--black);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    border-bottom: 3px solid var(--yellow);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  .logo span { color: var(--yellow); }
+
+  .admin-badge {
+    background: var(--yellow);
+    color: var(--black);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── LAYOUT ── */
+  .page-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+  }
+
+  .grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .grid-two { grid-template-columns: 1fr; }
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    padding: 24px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── FORM ── */
+  .field {
+    margin-bottom: 14px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input[type=text],
+  input[type=number],
+  select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  input:focus, select:focus { border-color: var(--green); }
+
+  /* ── IMAGE UPLOAD ── */
+  .image-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    background: #fafafa;
+  }
+
+  .image-upload-area:hover,
+  .image-upload-area.drag-over {
+    border-color: var(--green);
+    background: #f0faf4;
+  }
+
+  .image-upload-area input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  .upload-placeholder .upload-icon { font-size: 2rem; }
+  .upload-placeholder .upload-text { font-size: 0.85rem; color: var(--muted); }
+  .upload-placeholder .upload-hint { font-size: 0.75rem; color: #aaa; }
+
+  /* ── IMAGE PREVIEW ── */
+  .image-preview-wrap {
+    display: none;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .image-preview-wrap.has-image { display: block; }
+
+  .image-preview-wrap img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+  }
+
+  .remove-preview-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .remove-preview-btn:hover { background: var(--red); }
+
+  .image-upload-area.hidden { display: none; }
+
+  /* ── BTN ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.93rem;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn:hover { opacity: 0.88; }
+
+  .btn-green { background: var(--green); color: white; width: 100%; justify-content: center; margin-top: 4px; }
+  .btn-yellow { background: var(--yellow); color: var(--black); }
+  .btn-red { background: var(--red); color: white; }
+  .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+
+  /* ── PROGRESS ── */
+  .upload-progress {
+    display: none;
+    font-size: 0.8rem;
+    color: var(--green);
+    margin-top: 6px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── ITEMS LIST ── */
+  .items-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .admin-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--grey);
+    border-radius: 10px;
+    padding: 12px;
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .admin-item-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    overflow: hidden;
+  }
+
+  .admin-item-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  .admin-item-info { flex: 1; min-width: 0; }
+
+  .admin-item-name {
+    font-weight: 700;
+    font-size: 0.93rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-item-meta { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .admin-item-price { font-weight: 700; color: var(--red); font-size: 0.93rem; white-space: nowrap; }
+
+  /* ── CATEGORIES MANAGE ── */
+  .cat-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+  .cat-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--grey);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .cat-tag .remove-cat {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--red);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+  }
+
+  .cat-tag.fixed { opacity: 0.6; }
+  .cat-tag.fixed .remove-cat { display: none; }
+
+  .add-cat-row { display: flex; gap: 8px; }
+  .add-cat-row input { flex: 1; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--green);
+  }
+
+  .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── LINK TO SITE ── */
+  .site-link-bar {
+    background: var(--green);
+    color: white;
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .site-link-bar span { font-size: 0.9rem; }
+  .site-link-bar a {
+    color: var(--yellow);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+
+  .empty-msg {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .empty-msg .e { font-size: 2rem; margin-bottom: 8px; }
+
+  /* ── IMAGE SIZE WARNING ── */
+  .size-warning {
+    display: none;
+    font-size: 0.78rem;
+    color: #e67e22;
+    margin-top: 6px;
+    background: #fff8f0;
+    border: 1px solid #f5cba7;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">KISII UNI<br><span>ADMIN PANEL</span></div>
+  <span class="admin-badge">🔐 Owner Access</span>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="page-title">🛠️ Manage Biashara</div>
+  <div class="page-sub">Add items, remove sold items, manage categories. Wewe peke yako unaona ukurasa huu.</div>
+
+  <!-- LINK TO CUSTOMER PAGE -->
+  <div class="site-link-bar">
+    <span>👁️ Customer page:</span>
+    <a href="index.html" target="_blank">index.html → View Customer Site ↗</a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-number" id="statItems">0</div>
+      <div class="stat-label">Total Items</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statCats">0</div>
+      <div class="stat-label">Categories</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statPrice">0</div>
+      <div class="stat-label">Avg Price (KSh)</div>
+    </div>
+  </div>
+
+  <div class="grid-two">
+
+    <!-- ADD ITEM FORM -->
+    <div class="card">
+      <div class="card-title">➕ Ongeza Item Mpya</div>
+
+      <div class="field">
+        <label>Item Name / Jina la bidhaa</label>
+        <input type="text" id="iName" placeholder="e.g. Samsung Galaxy A14"/>
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <select id="iCategory"></select>
+      </div>
+
+      <div class="field">
+        <label>Price (KSh)</label>
+        <input type="number" id="iPrice" placeholder="e.g. 8500" min="0"/>
+      </div>
+
+      <div class="field">
+        <label>Seller Phone / WhatsApp</label>
+        <input type="text" id="iPhone" placeholder="e.g. 0712345678"/>
+      </div>
+
+      <!-- ── IMAGE UPLOAD ── -->
+      <div class="field">
+        <label>📸 Picha ya Bidhaa (optional)</label>
+
+        <!-- Upload area (shown when no image) -->
+        <div class="image-upload-area" id="uploadArea">
+          <input type="file" id="iImageFile" accept="image/*" onchange="handleImageUpload(event)"/>
+          <div class="upload-placeholder">
+            <span class="upload-icon">🖼️</span>
+            <span class="upload-text">Bonyeza hapa au drag & drop picha</span>
+            <span class="upload-hint">JPG, PNG, WEBP — max 5MB recommended</span>
+          </div>
+        </div>
+
+        <!-- Preview (shown when image selected) -->
+        <div class="image-preview-wrap" id="previewWrap">
+          <img id="previewImg" src="" alt="Preview"/>
+          <button class="remove-preview-btn" onclick="removeImage()" title="Remove image">✕</button>
+        </div>
+
+        <div class="size-warning" id="sizeWarning">
+          ⚠️ Picha ni kubwa sana (zaidi ya 2MB). Inaweza kufanya storage ijae haraka. Tumia picha ndogo kwa matokeo bora.
+        </div>
+        <div class="upload-progress" id="uploadProgress">⏳ Inapakua picha...</div>
+      </div>
+
+      <button class="btn btn-green" onclick="addItem()">✅ Ongeza Item</button>
+    </div>
+
+    <!-- CATEGORIES MANAGER -->
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">🏷️ Manage Categories</div>
+        <div class="cat-list" id="catList"></div>
+        <div class="add-cat-row">
+          <input type="text" id="newCatInput" placeholder="New category name..." onkeydown="if(event.key==='Enter')addCategory()"/>
+          <button class="btn btn-yellow" onclick="addCategory()">Add</button>
+        </div>
+      </div>
+
+      <!-- QUICK TIPS CARD -->
+      <div class="card">
+        <div class="card-title">📊 Quick Tips</div>
+        <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
+          • Bookmark this page — it's your secret admin link<br>
+          • 📸 Upload picha moja kwa kila item kwa clarity<br>
+          • Compress images to under 1MB for faster loading<br>
+          • Remove items immediately after selling<br>
+          • Use WhatsApp number format: 07XXXXXXXX<br>
+          • Images zinawekwa kwenye browser — clear cache = zinaenda
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITEMS LIST -->
+  <div class="card" style="margin-top:24px">
+    <div class="card-title">📦 All Listed Items <span style="font-size:0.8rem;font-weight:500;color:var(--muted)" id="listedCount"></span></div>
+    <div class="items-list" id="adminItemsList"></div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── HELPERS ──
+function getItems() { return JSON.parse(localStorage.getItem('ku_items') || '[]'); }
+function saveItems(items) { localStorage.setItem('ku_items', JSON.stringify(items)); }
+function getCategories() {
+  const defaults = ['Electronics', 'Clothes & Shoes', 'Furniture'];
+  const stored = JSON.parse(localStorage.getItem('ku_categories') || 'null');
+  return stored || defaults;
+}
+function saveCategories(cats) { localStorage.setItem('ku_categories', JSON.stringify(cats)); }
+
+const FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture'];
+
+const catEmoji = {
+  'Electronics': '📱',
+  'Clothes & Shoes': '👟',
+  'Furniture': '🛋️',
+  'Books': '📚',
+  'Kitchen': '🍳',
+  'default': '📦'
+};
+function getEmoji(cat) {
+  for (const key in catEmoji) {
+    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
+  }
+  return catEmoji.default;
+}
+
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#c0392b' : '#1a7a3c';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── IMAGE HANDLING ──
+let currentImageBase64 = '';
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const progress = document.getElementById('uploadProgress');
+  const warning = document.getElementById('sizeWarning');
+
+  // Show size warning if > 2MB
+  if (file.size > 2 * 1024 * 1024) {
+    warning.style.display = 'block';
+  } else {
+    warning.style.display = 'none';
+  }
+
+  // 5MB hard limit
+  if (file.size > 5 * 1024 * 1024) {
+    toast('⚠️ Picha ni kubwa mno! Max 5MB.', true);
+    event.target.value = '';
+    return;
+  }
+
+  progress.style.display = 'block';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    currentImageBase64 = e.target.result; // data:image/...;base64,...
+    document.getElementById('previewImg').src = currentImageBase64;
+    document.getElementById('previewWrap').classList.add('has-image');
+    document.getElementById('uploadArea').classList.add('hidden');
+    progress.style.display = 'none';
+  };
+  reader.onerror = function() {
+    toast('❌ Hitilafu ya kupakua picha. Jaribu tena.', true);
+    progress.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  currentImageBase64 = '';
+  document.getElementById('previewImg').src = '';
+  document.getElementById('previewWrap').classList.remove('has-image');
+  document.getElementById('uploadArea').classList.remove('hidden');
+  document.getElementById('iImageFile').value = '';
+  document.getElementById('sizeWarning').style.display = 'none';
+}
+
+// Drag & drop support
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('iImageFile').files = dt.files;
+    handleImageUpload({ target: { files: [file] } });
+  } else {
+    toast('⚠️ Faili hii si picha.', true);
+  }
+});
+
+// ── ADD ITEM ──
+function addItem() {
+  const name = document.getElementById('iName').value.trim();
+  const category = document.getElementById('iCategory').value;
+  const price = document.getElementById('iPrice').value.trim();
+  const phone = document.getElementById('iPhone').value.trim();
+
+  if (!name || !category || !price || !phone) {
+    toast('⚠️ Jaza sehemu zote muhimu!', true); return;
+  }
+  if (!/^0[0-9]{9}$/.test(phone)) {
+    toast('⚠️ Nambari ya simu lazima iwe kama 07XXXXXXXX', true); return;
+  }
+
+  // Try to save — localStorage can fail if full (base64 images are big)
+  const items = getItems();
+  const newItem = {
+    id: Date.now(),
+    name, category,
+    price: parseFloat(price),
+    phone,
+    image: currentImageBase64,
+    addedAt: new Date().toLocaleDateString('en-KE')
+  };
+  items.unshift(newItem);
+
+  try {
+    saveItems(items);
+  } catch(e) {
+    // Storage quota exceeded — try saving without image
+    toast('⚠️ Storage imejaa! Picha haikuhifadhiwa, item imeongezwa bila picha.', true);
+    newItem.image = '';
+    items[0] = newItem;
+    saveItems(items);
+  }
+
+  // Reset form
+  document.getElementById('iName').value = '';
+  document.getElementById('iPrice').value = '';
+  document.getElementById('iPhone').value = '';
+  removeImage();
+
+  toast('✅ Item imeongezwa successfully!');
+  renderAll();
+}
+
+// ── REMOVE ITEM ──
+function removeItem(id) {
+  if (!confirm('Una uhakika unataka kuondoa item hii? (Item imekwisha sold?)')) return;
+  let items = getItems().filter(i => i.id !== id);
+  saveItems(items);
+  toast('🗑️ Item imeondolewa.');
+  renderAll();
+}
+
+// ── CATEGORIES ──
+function addCategory() {
+  const input = document.getElementById('newCatInput');
+  const val = input.value.trim();
+  if (!val) return;
+  const cats = getCategories();
+  if (cats.map(c => c.toLowerCase()).includes(val.toLowerCase())) {
+    toast('Category hii ipo tayari!', true); return;
+  }
+  cats.push(val);
+  saveCategories(cats);
+  input.value = '';
+  toast('✅ Category imeongezwa!');
+  renderAll();
+}
+
+function removeCategory(cat) {
+  if (FIXED_CATS.includes(cat)) return;
+  if (!confirm(`Ondoa category "${cat}"?`)) return;
+  let cats = getCategories().filter(c => c !== cat);
+  saveCategories(cats);
+  toast('🗑️ Category imeondolewa.');
+  renderAll();
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  const items = getItems();
+  const cats = getCategories();
+
+  // Stats
+  document.getElementById('statItems').textContent = items.length;
+  document.getElementById('statCats').textContent = cats.length;
+  const avg = items.length ? Math.round(items.reduce((s, i) => s + i.price, 0) / items.length) : 0;
+  document.getElementById('statPrice').textContent = avg.toLocaleString();
+
+  // Category select
+  const sel = document.getElementById('iCategory');
+  const prev = sel.value;
+  sel.innerHTML = cats.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+  if (cats.includes(prev)) sel.value = prev;
+
+  // Category tags
+  document.getElementById('catList').innerHTML = cats.map(c => `
+    <div class="cat-tag ${FIXED_CATS.includes(c) ? 'fixed' : ''}">
+      ${getEmoji(c)} ${c}
+      <button class="remove-cat" onclick="removeCategory('${c}')" title="Remove">✕</button>
+    </div>
+  `).join('');
+
+  // Items list
+  const listEl = document.getElementById('adminItemsList');
+  document.getElementById('listedCount').textContent = `(${items.length} items)`;
+
+  if (items.length === 0) {
+    listEl.innerHTML = `<div class="empty-msg"><div class="e">📦</div>Bado hakuna items. Ongeza item ya kwanza!</div>`;
+    return;
+  }
+
+  listEl.innerHTML = items.map((item, idx) => `
+    <div class="admin-item" style="animation-delay:${idx*0.04}s">
+      <div class="admin-item-img">
+        ${item.image
+          ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='${getEmoji(item.category)}'"/>`
+          : getEmoji(item.category)}
+      </div>
+      <div class="admin-item-info">
+        <div class="admin-item-name">${item.name}</div>
+        <div class="admin-item-meta">
+          ${item.category} • 📞 ${item.phone} • Added ${item.addedAt || '—'}
+          ${item.image ? ' • <span style="color:var(--green)">📸 Ina picha</span>' : ' • <span style="color:#aaa">Picha: —</span>'}
+        </div>
+      </div>
+      <div class="admin-item-price">KSh ${Number(item.price).toLocaleString()}</div>
+      <button class="btn btn-red btn-sm" onclick="removeItem(${item.id})">🗑️ Sold/Remove</button>
+    </div>
+  `).join('');
+}
+
+renderAll();
+</script>
+</body>
+</html>
