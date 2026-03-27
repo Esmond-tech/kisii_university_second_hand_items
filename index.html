@@ -245,6 +245,7 @@
     object-fit: cover;
     display: block;
     background: var(--grey);
+    cursor: zoom-in;
   }
 
   .item-img-placeholder {
@@ -313,6 +314,45 @@
 
   .contact-btn:hover { opacity: 0.88; }
 
+  /* ── LIGHTBOX (IMAGE VIEWER) ── */
+  .lightbox {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--yellow);
+    color: var(--black);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+  }
+
   /* ── EMPTY STATE ── */
   .empty-state {
     grid-column: 1/-1;
@@ -380,6 +420,11 @@
   <strong>Kisii University Second-Hand Items</strong> &nbsp;•&nbsp; Biashara halisi, bei ya wanafunzi 🇰🇪
 </footer>
 
+<div class="lightbox" id="lightbox" onclick="closeImage()">
+  <button class="lightbox-close" onclick="closeImage()">✕</button>
+  <img id="lightboxImg" src="" alt="Full view" onclick="event.stopPropagation()">
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
@@ -418,6 +463,21 @@ function getEmoji(cat) {
 }
 
 let activeCategory = 'All';
+
+// ── Image Viewer Functions ──
+function viewImage(url) {
+  const lb = document.getElementById('lightbox');
+  const img = document.getElementById('lightboxImg');
+  img.src = url;
+  lb.classList.add('active');
+  document.body.style.overflow = 'hidden'; // Stop scrolling
+}
+
+function closeImage() {
+  const lb = document.getElementById('lightbox');
+  lb.classList.remove('active');
+  document.body.style.overflow = 'auto'; // Re-enable scrolling
+}
 
 // ── Render Categories ──
 function renderCategories() {
@@ -471,7 +531,7 @@ function loadAndRenderItems() {
     grid.innerHTML = items.map((item, idx) => `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
         ${item.image ? 
-          `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : 
+          `<img class="item-img" src="${item.image}" alt="${item.name}" onclick="viewImage('${item.image}')" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : 
           ''}
         <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">
           ${getEmoji(item.category)}
