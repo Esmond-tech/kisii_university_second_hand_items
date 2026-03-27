@@ -441,13 +441,20 @@
     </div>
 
     <div class="card">
-        <div class="card-title">📊 Quick Tips</div>
-        <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
-          • Images are hosted on Cloudinary for free<br>
-          • 40,000 visitors per month supported via Cloudflare<br>
-          • Always remove sold items to keep the list fresh.
-        </p>
+      <div class="card-title">📁 Manage Categories</div>
+      <div class="field">
+        <label>New Category Name</label>
+        <input type="text" id="newCatInput" placeholder="e.g. Sports"/>
       </div>
+      <button class="btn btn-yellow" style="width:100%; justify-content:center; margin-bottom:18px;" onclick="addNewCategory()">➕ Add Category</button>
+      
+      <div class="card-title">📊 Quick Tips</div>
+      <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
+        • Images are hosted on Cloudinary for free<br>
+        • 40,000 visitors per month supported via Cloudflare<br>
+        • Always remove sold items to keep the list fresh.
+      </p>
+    </div>
   </div>
 
   <div class="card" style="margin-top:24px">
@@ -486,7 +493,7 @@ const uploadPreset = "kisii_preset";
 let currentImageUrl = '';
 
 // ── UI Helpers ──
-const FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
+let FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
 const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
@@ -499,6 +506,24 @@ function toast(msg, isError = false) {
   t.style.background = isError ? '#c0392b' : '#1a7a3c';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Category Logic ──
+function addNewCategory() {
+  const val = document.getElementById('newCatInput').value.trim();
+  if(!val) return toast("Enter category name", true);
+  if(FIXED_CATS.includes(val)) return toast("Category exists", true);
+  
+  FIXED_CATS.push(val);
+  document.getElementById('newCatInput').value = '';
+  updateCatDropdown();
+  toast("Category added!");
+}
+
+function updateCatDropdown() {
+  const sel = document.getElementById('iCategory');
+  sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+  document.getElementById('statCats').textContent = FIXED_CATS.length;
 }
 
 // ── Cloudinary Upload Widget ──
@@ -570,16 +595,24 @@ function renderAll() {
   itemsRef.once('value', (snapshot) => {
     let items = [];
     let keys = [];
+    let totalPrice = 0;
+
     snapshot.forEach(child => {
-      items.push(child.val());
+      const data = child.val();
+      items.push(data);
       keys.push(child.key);
+      totalPrice += Number(data.price) || 0;
     });
 
+    // Update Stats
     document.getElementById('statItems').textContent = items.length;
     document.getElementById('statCats').textContent = FIXED_CATS.length;
     
-    const sel = document.getElementById('iCategory');
-    sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+    // Average Price Logic
+    const avg = items.length > 0 ? Math.round(totalPrice / items.length) : 0;
+    document.getElementById('statPrice').textContent = avg.toLocaleString();
+
+    updateCatDropdown();
 
     const listEl = document.getElementById('adminItemsList');
     listEl.innerHTML = items.map((item, idx) => `
