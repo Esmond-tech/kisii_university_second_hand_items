@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kisii Uni Second-Hand Items</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #1a7a3c;
+    --red: #c0392b;
+    --black: #111111;
+    --white: #fafaf8;
+    --yellow: #f5c518;
+    --grey: #f2f2f0;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0dc;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--black);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--green);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  .logo span { color: var(--yellow); }
+
+  .nav-badge {
+    background: var(--green);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── HERO STRIP ── */
+  .hero {
+    background: var(--green);
+    color: white;
+    padding: 36px 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-weight: 800;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    opacity: 0.88;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero p em { font-style: normal; color: var(--yellow); font-weight: 600; }
+
+  /* ── SEARCH BAR ── */
+  .search-wrap {
+    background: var(--black);
+    padding: 16px 24px;
+  }
+
+  .search-inner {
+    display: flex;
+    gap: 10px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .search-inner input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    background: #222;
+    color: white;
+    transition: border 0.2s;
+  }
+
+  .search-inner input::placeholder { color: #888; }
+  .search-inner input:focus { border-color: var(--green); }
+
+  .search-inner button {
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .search-inner button:hover { opacity: 0.85; }
+
+  /* ── CATEGORIES ── */
+  .categories-section {
+    padding: 24px 24px 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .categories-scroll {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 2px solid var(--border);
+    background: white;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+
+  .cat-chip:hover { border-color: var(--green); color: var(--green); }
+
+  .cat-chip.active {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .cat-chip .emoji { font-size: 1rem; }
+
+  /* ── ITEMS GRID ── */
+  .items-section {
+    padding: 28px 24px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .items-count {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .items-count strong { color: var(--text); }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── ITEM CARD ── */
+  .item-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+
+  .item-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    background: var(--grey);
+  }
+
+  .item-img-placeholder {
+    width: 100%;
+    height: 180px;
+    background: var(--grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+
+  .item-body {
+    padding: 14px;
+  }
+
+  .item-category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .item-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .item-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+
+  .item-price span {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  .contact-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .contact-btn:hover { opacity: 0.88; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .empty-state .big-emoji { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--text); margin-bottom: 6px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black);
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.82rem;
+  }
+
+  footer strong { color: var(--yellow); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 480px) {
+    .items-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .item-img, .item-img-placeholder { height: 140px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">KISII UNI<br><span>SECOND-HAND</span></div>
+  <span class="nav-badge">🇰🇪 Bei Poa • Good Deals</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Vitu Poa, Bei Nafuu 🔥</h1>
+  <p>Second-hand items kwa bei ya chini. <em>Students only vibes.</em></p>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-inner">
+    <input type="text" id="searchInput" placeholder="Tafuta kitu... e.g. phone, gas, jeans" oninput="filterItems()"/>
+    <button onclick="filterItems()">Tafuta 🔍</button>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="categories-section">
+  <div class="section-label">Categories</div>
+  <div class="categories-scroll" id="categoriesContainer">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- ITEMS -->
+<div class="items-section">
+  <div class="items-header">
+    <div class="section-label">Available Items</div>
+    <div class="items-count" id="itemsCount"></div>
+  </div>
+  <div class="items-grid" id="itemsGrid">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Kisii University Second-Hand Items</strong> &nbsp;•&nbsp; Biashara halisi, bei ya wanafunzi 🇰🇪
+</footer>
+
+<script>
+// ── STORAGE HELPERS ──
+function getItems() {
+  return JSON.parse(localStorage.getItem('ku_items') || '[]');
+}
+function getCategories() {
+  const defaults = ['Electronics', 'Clothes & Shoes', 'Furniture'];
+  const stored = JSON.parse(localStorage.getItem('ku_categories') || 'null');
+  return stored || defaults;
+}
+
+// ── CATEGORY EMOJIS ──
+const catEmoji = {
+  'Electronics': '📱',
+  'Clothes & Shoes': '👟',
+  'Furniture': '🛋️',
+  'Books': '📚',
+  'Kitchen': '🍳',
+  'default': '📦'
+};
+function getEmoji(cat) {
+  for (const key in catEmoji) {
+    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
+  }
+  return catEmoji.default;
+}
+
+let activeCategory = 'All';
+
+// ── RENDER CATEGORIES ──
+function renderCategories() {
+  const cats = ['All', ...getCategories()];
+  const container = document.getElementById('categoriesContainer');
+  container.innerHTML = cats.map(cat => `
+    <div class="cat-chip ${cat === activeCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
+      <span class="emoji">${cat === 'All' ? '🛒' : getEmoji(cat)}</span> ${cat}
+    </div>
+  `).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  renderCategories();
+  filterItems();
+}
+
+// ── RENDER ITEMS ──
+function filterItems() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  let items = getItems();
+
+  if (activeCategory !== 'All') {
+    items = items.filter(i => i.category === activeCategory);
+  }
+  if (query) {
+    items = items.filter(i =>
+      i.name.toLowerCase().includes(query) ||
+      i.category.toLowerCase().includes(query)
+    );
+  }
+
+  const grid = document.getElementById('itemsGrid');
+  const countEl = document.getElementById('itemsCount');
+
+  countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
+
+  if (items.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="big-emoji">🔍</div>
+        <h3>Hakuna items kwa sasa</h3>
+        <p>Try different category au search tena baadaye</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((item, idx) => `
+    <div class="item-card" style="animation-delay:${idx * 0.05}s">
+      ${item.image
+        ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : ''}
+      <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">${getEmoji(item.category)}</div>
+      <div class="item-body">
+        <div class="item-category">${item.category}</div>
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
+        <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
+          📲 Wasiliana na Seller
+        </a>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SEED DEMO ITEMS if empty ──
+function seedIfEmpty() {
+  if (getItems().length === 0) {
+    const demo = [
+      { id: 1, name: 'Samsung Galaxy A14', category: 'Electronics', price: 8500, phone: '0712345678', image: '' },
+      { id: 2, name: 'Gas Cooker (2 burner)', category: 'Kitchen', price: 3200, phone: '0798765432', image: '' },
+      { id: 3, name: 'Leather Jacket (Size M)', category: 'Clothes & Shoes', price: 1500, phone: '0745678901', image: '' },
+      { id: 4, name: 'Study Desk', category: 'Furniture', price: 2800, phone: '0712345678', image: '' },
+    ];
+    // Add Kitchen to categories if not there
+    const cats = getCategories();
+    if (!cats.includes('Kitchen')) cats.push('Kitchen');
+    localStorage.setItem('ku_categories', JSON.stringify(cats));
+    localStorage.setItem('ku_items', JSON.stringify(demo));
+  }
+}
+
+seedIfEmpty();
+renderCategories();
+filterItems();
+</script>
+</body>
+</html>
