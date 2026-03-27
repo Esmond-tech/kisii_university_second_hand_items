@@ -354,6 +354,31 @@
     font-size: 0.9rem;
   }
 
+  /* ── CATEGORY LIST UI ── */
+  .cat-manager-list {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--grey);
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  .del-cat-btn {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-weight: 800;
+    padding: 2px 8px;
+  }
+
   .empty-msg {
     text-align: center;
     padding: 30px;
@@ -448,7 +473,10 @@
       </div>
       <button class="btn btn-yellow" style="width:100%; justify-content:center; margin-bottom:18px;" onclick="addNewCategory()">➕ Add Category</button>
       
-      <div class="card-title">📊 Quick Tips</div>
+      <label>Existing Categories</label>
+      <div class="cat-manager-list" id="catManagerList"></div>
+
+      <div class="card-title" style="margin-top:20px">📊 Quick Tips</div>
       <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
         • Images are hosted on Cloudinary for free<br>
         • 40,000 visitors per month supported via Cloudflare<br>
@@ -494,6 +522,7 @@ let currentImageUrl = '';
 
 // ── UI Helpers ──
 let FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
+const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen']; // Protect these
 const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
@@ -520,10 +549,33 @@ function addNewCategory() {
   toast("Category added!");
 }
 
+function removeCategory(catName) {
+  if (CORE_CATS.includes(catName)) {
+    return toast("Cannot delete core category!", true);
+  }
+  if (confirm(`Ondoa category ya "${catName}"?`)) {
+    FIXED_CATS = FIXED_CATS.filter(c => c !== catName);
+    updateCatDropdown();
+    toast("Category removed.");
+  }
+}
+
 function updateCatDropdown() {
+  // Update Dropdown
   const sel = document.getElementById('iCategory');
   sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
+  
+  // Update Stats
   document.getElementById('statCats').textContent = FIXED_CATS.length;
+
+  // Update Manager List UI
+  const managerList = document.getElementById('catManagerList');
+  managerList.innerHTML = FIXED_CATS.map(c => `
+    <div class="cat-item">
+      <span>${getEmoji(c)} ${c}</span>
+      ${!CORE_CATS.includes(c) ? `<button class="del-cat-btn" onclick="removeCategory('${c}')">✕</button>` : '<small style="color:#aaa">Core</small>'}
+    </div>
+  `).join('');
 }
 
 // ── Cloudinary Upload Widget ──
@@ -606,7 +658,6 @@ function renderAll() {
 
     // Update Stats
     document.getElementById('statItems').textContent = items.length;
-    document.getElementById('statCats').textContent = FIXED_CATS.length;
     
     // Average Price Logic
     const avg = items.length > 0 ? Math.round(totalPrice / items.length) : 0;
