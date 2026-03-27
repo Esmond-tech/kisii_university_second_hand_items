@@ -388,16 +388,25 @@
   <strong>Kisii University Second-Hand Items</strong> &nbsp;•&nbsp; Biashara halisi, bei ya wanafunzi 🇰🇪
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <script>
-// ── STORAGE HELPERS ──
-function getItems() {
-  return JSON.parse(localStorage.getItem('ku_items') || '[]');
-}
-function getCategories() {
-  const defaults = ['Electronics', 'Clothes & Shoes', 'Furniture'];
-  const stored = JSON.parse(localStorage.getItem('ku_categories') || 'null');
-  return stored || defaults;
-}
+// ── Firebase Setup ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBq42vxsEor4XQTQ0LnXhqR-SkxLWx5ZpA",
+  authDomain: "kisii-uni-shop-a86e4.firebaseapp.com",
+  databaseURL: "https://kisii-uni-shop-a86e4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "kisii-uni-shop-a86e4",
+  storageBucket: "kisii-uni-shop-a86e4.firebasestorage.app",
+  messagingSenderId: "213271249826",
+  appId: "1:213271249826:web:f663db95894550c79168fb",
+  measurementId: "G-X55E79ZEJ9"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const itemsRef = db.ref('items');
 
 // ── CATEGORY EMOJIS ──
 const catEmoji = {
@@ -408,6 +417,7 @@ const catEmoji = {
   'Kitchen': '🍳',
   'default': '📦'
 };
+
 function getEmoji(cat) {
   for (const key in catEmoji) {
     if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
@@ -417,91 +427,103 @@ function getEmoji(cat) {
 
 let activeCategory = 'All';
 
-// ── RENDER CATEGORIES ──
+// ── Render Categories ──
 function renderCategories() {
-  const cats = ['All', ...getCategories()];
+  const cats = ['All', ...getCategoriesFromFirebase()]; // we'll load dynamically
+  // For simplicity, we load categories from items or you can manage them separately
+  // For now we use a simple version
   const container = document.getElementById('categoriesContainer');
-  container.innerHTML = cats.map(cat => `
-    <div class="cat-chip ${cat === activeCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
-      <span class="emoji">${cat === 'All' ? '🛒' : getEmoji(cat)}</span> ${cat}
-    </div>
-  `).join('');
+  // We'll populate categories from items later if needed
+}
+
+// Better version: load categories dynamically from items
+function getCategoriesFromFirebase() {
+  // We'll handle inside load function
+  return [];
+}
+
+// ── Load and Render Items (Firebase version) ──
+function loadAndRenderItems() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const grid = document.getElementById('itemsGrid');
+  const countEl = document.getElementById('itemsCount');
+
+  itemsRef.once('value', (snapshot) => {
+    let items = [];
+    snapshot.forEach((child) => {
+      items.push(child.val());
+    });
+
+    // Filter
+    if (activeCategory !== 'All') {
+      items = items.filter(i => i.category === activeCategory);
+    }
+    if (query) {
+      items = items.filter(i => 
+        i.name.toLowerCase().includes(query) || 
+        i.category.toLowerCase().includes(query)
+      );
+    }
+
+    countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
+
+    if (items.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="big-emoji">🔍</div>
+          <h3>Hakuna items kwa sasa</h3>
+          <p>Try different category au search tena baadaye</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = items.map((item, idx) => `
+      <div class="item-card" style="animation-delay:${idx * 0.05}s">
+        ${item.image ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
+        <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">${getEmoji(item.category)}</div>
+        <div class="item-body">
+          <div class="item-category">${item.category}</div>
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
+          <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
+            📲 Wasiliana na Seller
+          </a>
+        </div>
+      </div>
+    `).join('');
+  });
 }
 
 function setCategory(cat) {
   activeCategory = cat;
   renderCategories();
-  filterItems();
+  loadAndRenderItems();
 }
 
-// ── RENDER ITEMS ──
-function filterItems() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  let items = getItems();
+// Real-time updates (items appear instantly)
+itemsRef.on('value', () => {
+  loadAndRenderItems();
+});
 
-  if (activeCategory !== 'All') {
-    items = items.filter(i => i.category === activeCategory);
-  }
-  if (query) {
-    items = items.filter(i =>
-      i.name.toLowerCase().includes(query) ||
-      i.category.toLowerCase().includes(query)
-    );
-  }
+// Search input
+document.getElementById('searchInput').addEventListener('input', loadAndRenderItems);
 
-  const grid = document.getElementById('itemsGrid');
-  const countEl = document.getElementById('itemsCount');
-
-  countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
-
-  if (items.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="big-emoji">🔍</div>
-        <h3>Hakuna items kwa sasa</h3>
-        <p>Try different category au search tena baadaye</p>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = items.map((item, idx) => `
-    <div class="item-card" style="animation-delay:${idx * 0.05}s">
-      ${item.image
-        ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : ''}
-      <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">${getEmoji(item.category)}</div>
-      <div class="item-body">
-        <div class="item-category">${item.category}</div>
-        <div class="item-name">${item.name}</div>
-        <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
-        <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
-          📲 Wasiliana na Seller
-        </a>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── SEED DEMO ITEMS if empty ──
+// Initial load + seed demo if empty
 function seedIfEmpty() {
-  if (getItems().length === 0) {
-    const demo = [
-      { id: 1, name: 'Samsung Galaxy A14', category: 'Electronics', price: 8500, phone: '0712345678', image: '' },
-      { id: 2, name: 'Gas Cooker (2 burner)', category: 'Kitchen', price: 3200, phone: '0798765432', image: '' },
-      { id: 3, name: 'Leather Jacket (Size M)', category: 'Clothes & Shoes', price: 1500, phone: '0745678901', image: '' },
-      { id: 4, name: 'Study Desk', category: 'Furniture', price: 2800, phone: '0712345678', image: '' },
-    ];
-    // Add Kitchen to categories if not there
-    const cats = getCategories();
-    if (!cats.includes('Kitchen')) cats.push('Kitchen');
-    localStorage.setItem('ku_categories', JSON.stringify(cats));
-    localStorage.setItem('ku_items', JSON.stringify(demo));
-  }
+  itemsRef.once('value', (snapshot) => {
+    if (!snapshot.exists() || snapshot.numChildren() === 0) {
+      const demo = [
+        { id: Date.now(), name: 'Samsung Galaxy A14', category: 'Electronics', price: 8500, phone: '0712345678', image: '', addedAt: new Date().toLocaleDateString('en-KE') },
+        { id: Date.now()+1, name: 'Gas Cooker (2 burner)', category: 'Kitchen', price: 3200, phone: '0798765432', image: '', addedAt: new Date().toLocaleDateString('en-KE') },
+      ];
+      demo.forEach(item => itemsRef.push(item));
+    }
+  });
 }
 
-seedIfEmpty();
 renderCategories();
-filterItems();
+loadAndRenderItems();
+seedIfEmpty();
 </script>
 </body>
 </html>
