@@ -391,6 +391,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <script>
 // ── Firebase Setup ──
 const firebaseConfig = {
@@ -407,6 +410,7 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
+const categoriesRef = db.ref('categories');
 
 // ── CATEGORY EMOJIS ──
 const catEmoji = {
@@ -420,29 +424,35 @@ const catEmoji = {
 
 function getEmoji(cat) {
   for (const key in catEmoji) {
-    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
+    if (cat && cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
   }
   return catEmoji.default;
 }
 
 let activeCategory = 'All';
 
-// ── Render Categories ──
-function renderCategories() {
-  const cats = ['All', ...getCategoriesFromFirebase()]; // we'll load dynamically
-  // For simplicity, we load categories from items or you can manage them separately
-  // For now we use a simple version
+// ── Render Categories (Now from Firebase) ──
+function renderCategories(cats) {
+  const allCats = ['All', ...cats];
   const container = document.getElementById('categoriesContainer');
-  // We'll populate categories from items later if needed
+  
+  container.innerHTML = allCats.map(cat => `
+    <div class="cat-chip ${cat === activeCategory ? 'active' : ''}" onclick="setCategory('${cat}')">
+      <span class="emoji">${cat === 'All' ? '🛒' : getEmoji(cat)}</span> ${cat}
+    </div>
+  `).join('');
 }
 
-// Better version: load categories dynamically from items
-function getCategoriesFromFirebase() {
-  // We'll handle inside load function
-  return [];
+// ── Load Categories from Firebase ──
+function loadCategories(callback) {
+  categoriesRef.once('value', (snapshot) => {
+    let cats = snapshot.val() || ['Electronics', 'Clothes & Shoes', 'Furniture'];
+    if (!Array.isArray(cats)) cats = ['Electronics', 'Clothes & Shoes', 'Furniture'];
+    callback(cats);
+  });
 }
 
-// ── Load and Render Items (Firebase version) ──
+// ── Load and Render Items ──
 function loadAndRenderItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const grid = document.getElementById('itemsGrid');
@@ -454,14 +464,16 @@ function loadAndRenderItems() {
       items.push(child.val());
     });
 
-    // Filter
+    // Filter by active category
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
     }
+
+    // Search filter
     if (query) {
       items = items.filter(i => 
-        i.name.toLowerCase().includes(query) || 
-        i.category.toLowerCase().includes(query)
+        (i.name && i.name.toLowerCase().includes(query)) ||
+        (i.category && i.category.toLowerCase().includes(query))
       );
     }
 
@@ -479,13 +491,13 @@ function loadAndRenderItems() {
 
     grid.innerHTML = items.map((item, idx) => `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${item.image ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
+        ${item.image ? `<img class="item-img" src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
         <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">${getEmoji(item.category)}</div>
         <div class="item-body">
-          <div class="item-category">${item.category}</div>
+          <div class="item-category">${item.category || 'Uncategorized'}</div>
           <div class="item-name">${item.name}</div>
-          <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
-          <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
+          <div class="item-price">KSh ${Number(item.price || 0).toLocaleString()}<span>negotiable</span></div>
+          <a class="contact-btn" href="https://wa.me/254${(item.phone || '').replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name || '')}" target="_blank">
             📲 Wasiliana na Seller
           </a>
         </div>
@@ -496,34 +508,23 @@ function loadAndRenderItems() {
 
 function setCategory(cat) {
   activeCategory = cat;
-  renderCategories();
-  loadAndRenderItems();
-}
-
-// Real-time updates (items appear instantly)
-itemsRef.on('value', () => {
-  loadAndRenderItems();
-});
-
-// Search input
-document.getElementById('searchInput').addEventListener('input', loadAndRenderItems);
-
-// Initial load + seed demo if empty
-function seedIfEmpty() {
-  itemsRef.once('value', (snapshot) => {
-    if (!snapshot.exists() || snapshot.numChildren() === 0) {
-      const demo = [
-        { id: Date.now(), name: 'Samsung Galaxy A14', category: 'Electronics', price: 8500, phone: '0712345678', image: '', addedAt: new Date().toLocaleDateString('en-KE') },
-        { id: Date.now()+1, name: 'Gas Cooker (2 burner)', category: 'Kitchen', price: 3200, phone: '0798765432', image: '', addedAt: new Date().toLocaleDateString('en-KE') },
-      ];
-      demo.forEach(item => itemsRef.push(item));
-    }
+  loadCategories((cats) => {
+    renderCategories(cats);
+    loadAndRenderItems();
   });
 }
 
-renderCategories();
-loadAndRenderItems();
-seedIfEmpty();
+// Real-time listener for items
+itemsRef.on('value', loadAndRenderItems);
+
+// Search
+document.getElementById('searchInput').addEventListener('input', loadAndRenderItems);
+
+// Initial load
+loadCategories((cats) => {
+  renderCategories(cats);
+  loadAndRenderItems();
+});
 </script>
 </body>
 </html>
