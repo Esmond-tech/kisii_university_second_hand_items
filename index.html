@@ -101,6 +101,45 @@
 
   .hero p em { font-style: normal; color: var(--yellow); font-weight: 600; }
 
+  /* ── WELCOME MODAL (Only new addition) ── */
+  .welcome-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+
+  .modal-content {
+    background: white;
+    max-width: 360px;
+    width: 90%;
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  }
+
+  .modal-content p {
+    font-size: 1.08rem;
+    line-height: 1.45;
+    margin: 20px 0;
+  }
+
+  .modal-btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
   /* ── SEARCH BAR ── */
   .search-wrap {
     background: var(--black);
@@ -384,10 +423,19 @@
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <div class="logo">KISII UNI<br><span>SECOND-HAND</span></div>
   <span class="nav-badge">🇰🇪 Bei Poa • Good Deals</span>
 </nav>
+
+<!-- WELCOME MODAL - Added only this section -->
+<div id="welcomeModal" class="welcome-modal">
+  <div class="modal-content">
+    <p id="welcomeMessage">Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!</p>
+    <button onclick="closeWelcomeModal()" class="modal-btn">Sawa, Nashukuru! 🔥</button>
+  </div>
+</div>
 
 <div class="hero">
   <h1>Vitu Poa, Bei Nafuu 🔥</h1>
@@ -444,6 +492,7 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
+const welcomeRef = db.ref('welcomeMessage');   // Added for welcome message
 
 // ── CATEGORY EMOJIS ──
 const catEmoji = {
@@ -464,19 +513,33 @@ function getEmoji(cat) {
 
 let activeCategory = 'All';
 
+// ── Welcome Message Logic (Only new code) ──
+function loadWelcomeMessage() {
+  welcomeRef.once('value', (snapshot) => {
+    const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
+    document.getElementById('welcomeMessage').textContent = msg;
+    document.getElementById('welcomeModal').style.display = 'flex';
+  });
+}
+
+function closeWelcomeModal() {
+  document.getElementById('welcomeModal').style.display = 'none';
+  localStorage.setItem('welcomeSeenToday', new Date().toDateString());
+}
+
 // ── Image Viewer Functions ──
 function viewImage(url) {
   const lb = document.getElementById('lightbox');
   const img = document.getElementById('lightboxImg');
   img.src = url;
   lb.classList.add('active');
-  document.body.style.overflow = 'hidden'; // Stop scrolling
+  document.body.style.overflow = 'hidden';
 }
 
 function closeImage() {
   const lb = document.getElementById('lightbox');
   lb.classList.remove('active');
-  document.body.style.overflow = 'auto'; // Re-enable scrolling
+  document.body.style.overflow = 'auto';
 }
 
 // ── Render Categories ──
@@ -503,12 +566,10 @@ function loadAndRenderItems() {
       items.push(child.val());
     });
 
-    // Filter by Category
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
     }
     
-    // Filter by Search Query
     if (query) {
       items = items.filter(i => 
         i.name.toLowerCase().includes(query) || 
@@ -556,12 +617,10 @@ function setCategory(cat) {
   loadAndRenderItems();
 }
 
-// Filter on search input
 function filterItems() {
   loadAndRenderItems();
 }
 
-// Real-time updates
 itemsRef.on('value', () => {
   loadAndRenderItems();
 });
@@ -569,6 +628,7 @@ itemsRef.on('value', () => {
 // Initial load
 renderCategories();
 loadAndRenderItems();
+loadWelcomeMessage();   // ← Welcome popup added here
 </script>
 </body>
 </html>
