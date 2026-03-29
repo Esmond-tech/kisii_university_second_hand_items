@@ -399,6 +399,17 @@
 
 <div class="page-wrap">
 
+  <!-- ====================== DAILY WELCOME MESSAGE (Only addition) ====================== -->
+  <div class="card">
+    <div class="card-title">✍️ Daily Welcome Message</div>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">
+      This message will appear as a popup when students open the website.
+    </p>
+    <textarea id="welcomeInput" rows="4" style="width:100%; padding:14px; border:2px solid var(--border); border-radius:10px; font-size:1rem; resize:vertical;"></textarea>
+    <button class="btn btn-green" onclick="saveWelcomeMessage()" style="margin-top:14px;">💾 Save New Message</button>
+  </div>
+  <!-- ====================== END OF NEW SECTION ====================== -->
+
   <div class="page-title">🛠️ Manage Biashara</div>
   <div class="page-sub">Add items, remove sold items, and manage listings.</div>
 
@@ -513,6 +524,7 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
+const welcomeRef = db.ref('welcomeMessage');   // ← Added for welcome message
 
 // ── Cloudinary Config ──
 const cloudName = "df9ulrvka"; 
@@ -522,7 +534,7 @@ let currentImageUrl = '';
 
 // ── UI Helpers ──
 let FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
-const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen']; // Protect these
+const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
 const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
@@ -536,6 +548,22 @@ function toast(msg, isError = false) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2800);
 }
+
+// ── New: Welcome Message Functions ──
+function saveWelcomeMessage() {
+  const message = document.getElementById('welcomeInput').value.trim();
+  if (!message) return toast("Message cannot be empty!", true);
+  
+  welcomeRef.set(message).then(() => {
+    toast("✅ Daily welcome message saved successfully!");
+  });
+}
+
+// Load current message
+welcomeRef.once('value', (snapshot) => {
+  const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
+  document.getElementById('welcomeInput').value = msg;
+});
 
 // ── Category Logic ──
 function addNewCategory() {
@@ -561,14 +589,11 @@ function removeCategory(catName) {
 }
 
 function updateCatDropdown() {
-  // Update Dropdown
   const sel = document.getElementById('iCategory');
   sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
   
-  // Update Stats
   document.getElementById('statCats').textContent = FIXED_CATS.length;
 
-  // Update Manager List UI
   const managerList = document.getElementById('catManagerList');
   managerList.innerHTML = FIXED_CATS.map(c => `
     <div class="cat-item">
@@ -656,10 +681,8 @@ function renderAll() {
       totalPrice += Number(data.price) || 0;
     });
 
-    // Update Stats
     document.getElementById('statItems').textContent = items.length;
     
-    // Average Price Logic
     const avg = items.length > 0 ? Math.round(totalPrice / items.length) : 0;
     document.getElementById('statPrice').textContent = avg.toLocaleString();
 
@@ -683,6 +706,7 @@ function renderAll() {
 }
 
 renderAll();
+updateCatDropdown();
 </script>
 </body>
 </html>
