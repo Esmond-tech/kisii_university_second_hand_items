@@ -2,6 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' 'unsafe-inline'
+    https://www.gstatic.com
+    https://upload-widget.cloudinary.com;
+  style-src 'self' 'unsafe-inline'
+    https://fonts.googleapis.com;
+  font-src
+    https://fonts.gstatic.com;
+  img-src 'self' data: blob:
+    https://res.cloudinary.com
+    https://firebasestorage.googleapis.com;
+  connect-src
+    https://*.firebaseio.com
+    https://*.googleapis.com
+    https://upload-widget.cloudinary.com
+    https://api.cloudinary.com;
+  frame-src
+    https://upload-widget.cloudinary.com;
+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin – Kisii Uni Second-Hand</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -27,6 +47,87 @@
     color: var(--text);
     min-height: 100vh;
   }
+
+  /* ── PASSWORD GATE ── */
+  #passwordGate {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  #passwordGate.hidden { display: none; }
+
+  .gate-box {
+    background: #1a1a1a;
+    border: 1.5px solid #333;
+    border-radius: 14px;
+    padding: 36px 32px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+
+  .gate-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .gate-logo span { color: var(--yellow); }
+
+  .gate-sub {
+    font-size: 0.82rem;
+    color: #888;
+    margin-bottom: 28px;
+  }
+
+  .gate-input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid #333;
+    background: #111;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border 0.2s;
+  }
+
+  .gate-input:focus { border-color: var(--yellow); }
+
+  .gate-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .gate-btn:hover { opacity: 0.88; }
+
+  .gate-error {
+    font-size: 0.82rem;
+    color: var(--red);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  /* Hide page content until unlocked */
+  #pageContent { display: none; }
 
   /* ── NAV ── */
   nav {
@@ -392,6 +493,20 @@
 </head>
 <body>
 
+<!-- FIREBASE AUTH GATE -->
+<div id="passwordGate">
+  <div class="gate-box">
+    <div class="gate-logo">KISII UNI <span>ADMIN</span></div>
+    <div class="gate-sub">Sign in to access the admin panel</div>
+    <input class="gate-input" type="email" id="gateEmail" placeholder="Email address" onkeydown="if(event.key==='Enter') document.getElementById('gatePass').focus()"/>
+    <input class="gate-input" type="password" id="gatePass" placeholder="Password" style="margin-top:10px" onkeydown="if(event.key==='Enter') adminLogin()"/>
+    <button class="gate-btn" id="loginBtn" onclick="adminLogin()">Sign In</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
+<div id="pageContent">
+
 <nav>
   <div class="logo">KISII UNI<br><span>ADMIN PANEL</span></div>
   <span class="admin-badge">🔐 Owner Access</span>
@@ -399,7 +514,7 @@
 
 <div class="page-wrap">
 
-  <!-- ====================== DAILY WELCOME MESSAGE (Only addition) ====================== -->
+  <!-- Daily Welcome Message -->
   <div class="card">
     <div class="card-title">✍️ Daily Welcome Message</div>
     <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">
@@ -408,7 +523,25 @@
     <textarea id="welcomeInput" rows="4" style="width:100%; padding:14px; border:2px solid var(--border); border-radius:10px; font-size:1rem; resize:vertical;"></textarea>
     <button class="btn btn-green" onclick="saveWelcomeMessage()" style="margin-top:14px;">💾 Save New Message</button>
   </div>
-  <!-- ====================== END OF NEW SECTION ====================== -->
+
+  <!-- Visitor Analytics - Functional & Persistent -->
+  <div class="card">
+    <div class="card-title">📊 Visitor Analytics</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px;">
+      <div style="text-align: center; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div id="visitorsToday" style="font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--green);">0</div>
+        <div style="font-size: 0.85rem; color: var(--muted);">Today</div>
+      </div>
+      <div style="text-align: center; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div id="visitorsWeek" style="font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--green);">0</div>
+        <div style="font-size: 0.85rem; color: var(--muted);">This Week</div>
+      </div>
+      <div style="text-align: center; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div id="visitorsMonth" style="font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: var(--green);">0</div>
+        <div style="font-size: 0.85rem; color: var(--muted);">This Month</div>
+      </div>
+    </div>
+  </div>
 
   <div class="page-title">🛠️ Manage Biashara</div>
   <div class="page-sub">Add items, remove sold items, and manage listings.</div>
@@ -506,6 +639,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
 
@@ -524,7 +658,8 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
-const welcomeRef = db.ref('welcomeMessage');   // ← Added for welcome message
+const welcomeRef = db.ref('welcomeMessage');
+const visitorsRef = db.ref('visitors');   // New for persistent visitor tracking
 
 // ── Cloudinary Config ──
 const cloudName = "df9ulrvka"; 
@@ -534,11 +669,23 @@ let currentImageUrl = '';
 
 // ── UI Helpers ──
 let FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
-const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
+const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen']; // Protect these
 const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
   return catEmoji[cat] || catEmoji.default;
+}
+
+
+// ── XSS Sanitizer ──
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 function toast(msg, isError = false) {
@@ -549,7 +696,27 @@ function toast(msg, isError = false) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── New: Welcome Message Functions ──
+// ── New: Visitor Analytics Functions ──
+function loadVisitorStats() {
+  const now = new Date();
+  const todayKey = now.toISOString().split('T')[0];           // YYYY-MM-DD
+  const weekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000)).toString();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  visitorsRef.child('today').child(todayKey).once('value', (snap) => {
+    document.getElementById('visitorsToday').textContent = snap.val() || 0;
+  });
+
+  visitorsRef.child('week').child(weekKey).once('value', (snap) => {
+    document.getElementById('visitorsWeek').textContent = snap.val() || 0;
+  });
+
+  visitorsRef.child('month').child(monthKey).once('value', (snap) => {
+    document.getElementById('visitorsMonth').textContent = snap.val() || 0;
+  });
+}
+
+// ── Welcome Message Functions ──
 function saveWelcomeMessage() {
   const message = document.getElementById('welcomeInput').value.trim();
   if (!message) return toast("Message cannot be empty!", true);
@@ -559,7 +726,7 @@ function saveWelcomeMessage() {
   });
 }
 
-// Load current message
+// Load current welcome message
 welcomeRef.once('value', (snapshot) => {
   const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
   document.getElementById('welcomeInput').value = msg;
@@ -595,12 +762,14 @@ function updateCatDropdown() {
   document.getElementById('statCats').textContent = FIXED_CATS.length;
 
   const managerList = document.getElementById('catManagerList');
-  managerList.innerHTML = FIXED_CATS.map(c => `
+  managerList.innerHTML = FIXED_CATS.map(c => {
+    const safeC = sanitize(c);
+    return `
     <div class="cat-item">
-      <span>${getEmoji(c)} ${c}</span>
-      ${!CORE_CATS.includes(c) ? `<button class="del-cat-btn" onclick="removeCategory('${c}')">✕</button>` : '<small style="color:#aaa">Core</small>'}
-    </div>
-  `).join('');
+      <span>${getEmoji(c)} ${safeC}</span>
+      ${!CORE_CATS.includes(c) ? `<button class="del-cat-btn" onclick="removeCategory('${safeC}')">✕</button>` : '<small style="color:#aaa">Core</small>'}
+    </div>`;
+  }).join('');
 }
 
 // ── Cloudinary Upload Widget ──
@@ -635,8 +804,22 @@ function addItem() {
   const price = document.getElementById('iPrice').value.trim();
   const phone = document.getElementById('iPhone').value.trim();
 
-  if (!name || !price || !phone) {
-    toast('⚠️ Jaza sehemu zote!', true); return;
+  // ── Input Validation ──
+  if (!name) {
+    toast('⚠️ Weka jina la bidhaa!', true); return;
+  }
+  if (name.length > 100) {
+    toast('⚠️ Jina ni ndefu sana. Max 100 characters.', true); return;
+  }
+  if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+    toast('⚠️ Bei si sahihi. Weka namba halisi zaidi ya 0.', true); return;
+  }
+  if (!phone) {
+    toast('⚠️ Weka namba ya simu!', true); return;
+  }
+  const cleanPhone = phone.replace(/\s/g, '');
+  if (!/^(07|01)\d{8}$/.test(cleanPhone)) {
+    toast('⚠️ Simu lazima ianze 07/01 na iwe na digits 10. Mfano: 0712345678', true); return;
   }
 
   const newItem = {
@@ -644,7 +827,7 @@ function addItem() {
     name,
     category,
     price: parseFloat(price),
-    phone,
+    phone: cleanPhone,
     image: currentImageUrl,
     addedAt: new Date().toLocaleDateString('en-KE')
   };
@@ -689,24 +872,88 @@ function renderAll() {
     updateCatDropdown();
 
     const listEl = document.getElementById('adminItemsList');
-    listEl.innerHTML = items.map((item, idx) => `
+    listEl.innerHTML = items.map((item, idx) => {
+      const safeName = sanitize(item.name);
+      const safeCategory = sanitize(item.category);
+      const safePhone = sanitize(item.phone);
+      const safePrice = sanitize(String(item.price));
+      const safeImg = item.image ? sanitize(item.image) : '';
+      const safeKey = sanitize(keys[idx]);
+      return `
       <div class="admin-item">
         <div class="admin-item-img">
-          ${item.image ? `<img src="${item.image}"/>` : getEmoji(item.category)}
+          ${safeImg ? `<img src="${safeImg}"/>` : getEmoji(item.category)}
         </div>
         <div class="admin-item-info">
-          <div class="admin-item-name">${item.name}</div>
-          <div class="admin-item-meta">${item.category} • ${item.phone}</div>
+          <div class="admin-item-name">${safeName}</div>
+          <div class="admin-item-meta">${safeCategory} • ${safePhone}</div>
         </div>
-        <div class="admin-item-price">KSh ${item.price}</div>
-        <button class="btn btn-red btn-sm" onclick="removeItem('${keys[idx]}')">🗑️ Sold</button>
-      </div>
-    `).join('');
+        <div class="admin-item-price">KSh ${safePrice}</div>
+        <button class="btn btn-red btn-sm" onclick="removeItem('${safeKey}')">🗑️ Sold</button>
+      </div>`;
+    }).join('');
   });
 }
 
-renderAll();
-updateCatDropdown();
+// ── Firebase Authentication Gate ──
+const auth = firebase.auth();
+
+// Sign out on every page load — forces fresh login every time
+auth.signOut();
+
+function adminLogin() {
+  const email = document.getElementById('gateEmail').value.trim();
+  const pass = document.getElementById('gatePass').value;
+  const errEl = document.getElementById('gateError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!email || !pass) {
+    errEl.textContent = 'Please enter your email and password.';
+    return;
+  }
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  errEl.textContent = '';
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      // onAuthStateChanged handles the reveal
+    })
+    .catch((error) => {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        errEl.textContent = 'Incorrect email or password.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errEl.textContent = 'Too many attempts. Try again later.';
+      } else {
+        errEl.textContent = 'Login failed. Please try again.';
+      }
+      document.getElementById('gatePass').value = '';
+    });
+}
+
+// Listen for auth state — this is the single source of truth
+let adminInitialized = false;
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById('passwordGate').classList.add('hidden');
+    document.getElementById('pageContent').style.display = 'block';
+    // Only initialize admin data after confirmed login
+    if (!adminInitialized) {
+      adminInitialized = true;
+      renderAll();
+      updateCatDropdown();
+      loadVisitorStats();
+    }
+  } else {
+    document.getElementById('passwordGate').classList.remove('hidden');
+    document.getElementById('pageContent').style.display = 'none';
+    adminInitialized = false;
+  }
+});
 </script>
+</div><!-- end #pageContent -->
 </body>
 </html>
