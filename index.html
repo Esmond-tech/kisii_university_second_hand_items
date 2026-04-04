@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://upload-widget.cloudinary.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src * https: data: blob:; connect-src * https: wss:; frame-src https://upload-widget.cloudinary.com;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kisii Uni Second-Hand Items</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -101,7 +102,7 @@
 
   .hero p em { font-style: normal; color: var(--yellow); font-weight: 600; }
 
-  /* ── WELCOME MODAL (Only new addition) ── */
+  /* ── WELCOME MODAL ── */
   .welcome-modal {
     position: fixed;
     top: 0; left: 0;
@@ -183,6 +184,33 @@
 
   .search-inner button:hover { opacity: 0.85; }
 
+  /* ── POST ITEM BUTTON ── */
+  .post-btn-wrap {
+    padding: 16px 24px 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .post-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .post-btn:hover { opacity: 0.88; }
+
   /* ── CATEGORIES ── */
   .categories-section {
     padding: 24px 24px 0;
@@ -258,7 +286,6 @@
     gap: 18px;
   }
 
-  /* ── ITEM CARD ── */
   .item-card {
     background: var(--card-bg);
     border-radius: 12px;
@@ -353,7 +380,7 @@
 
   .contact-btn:hover { opacity: 0.88; }
 
-  /* ── LIGHTBOX (IMAGE VIEWER) ── */
+  /* ── LIGHTBOX ── */
   .lightbox {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -414,7 +441,123 @@
 
   footer strong { color: var(--yellow); }
 
-  /* ── RESPONSIVE ── */
+  /* ── POST MODAL ── */
+  .post-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+  }
+
+  .post-modal-content {
+    background: white;
+    max-width: 460px;
+    width: 94%;
+    border-radius: 20px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .pm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1.5px solid #f0f0ee;
+    position: sticky;
+    top: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+  }
+
+  .pm-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 800; }
+
+  .pm-close {
+    width: 32px; height: 32px;
+    border-radius: 50%; border: none;
+    background: #f2f2f0; color: #555;
+    font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .pm-close:hover { background: #e0e0dc; }
+
+  .pm-body { padding: 20px 24px 28px; }
+
+  .pm-field { margin-bottom: 16px; }
+
+  .pm-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 6px;
+  }
+
+  .pm-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e8e8e4;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border 0.2s;
+    background: white;
+    color: var(--text);
+  }
+
+  .pm-input:focus { border-color: var(--green); }
+
+  .pm-upload {
+    border: 2px dashed #e0e0dc;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafa;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .pm-upload:hover { border-color: var(--green); background: #f0faf4; }
+
+  .pm-error {
+    display: none;
+    background: #fdf0f0;
+    border: 1.5px solid #f5c6c6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--red);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .pm-submit {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--green);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .pm-submit:hover { opacity: 0.88; }
+
   @media (max-width: 480px) {
     .items-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .item-img, .item-img-placeholder { height: 140px; }
@@ -429,7 +572,7 @@
   <span class="nav-badge">🇰🇪 Bei Poa • Good Deals</span>
 </nav>
 
-<!-- WELCOME MODAL - Added only this section -->
+<!-- WELCOME MODAL -->
 <div id="welcomeModal" class="welcome-modal">
   <div class="modal-content">
     <p id="welcomeMessage">Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!</p>
@@ -449,10 +592,13 @@
   </div>
 </div>
 
+<div class="post-btn-wrap">
+  <button class="post-btn" onclick="document.getElementById('postModal').style.display='flex'">🛍️ Post an Item</button>
+</div>
+
 <div class="categories-section">
   <div class="section-label">Categories</div>
-  <div class="categories-scroll" id="categoriesContainer">
-    </div>
+  <div class="categories-scroll" id="categoriesContainer"></div>
 </div>
 
 <div class="items-section">
@@ -460,8 +606,7 @@
     <div class="section-label">Available Items</div>
     <div class="items-count" id="itemsCount"></div>
   </div>
-  <div class="items-grid" id="itemsGrid">
-    </div>
+  <div class="items-grid" id="itemsGrid"></div>
 </div>
 
 <footer>
@@ -473,11 +618,57 @@
   <img id="lightboxImg" src="" alt="Full view" onclick="event.stopPropagation()">
 </div>
 
+<!-- POST ITEM MODAL -->
+<div id="postModal" class="post-modal">
+  <div class="post-modal-content">
+    <div class="pm-header">
+      <div class="pm-title">➕ Ongeza Item Mpya</div>
+      <button class="pm-close" onclick="document.getElementById('postModal').style.display='none'">✕</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-field">
+        <label class="pm-label">Item Name</label>
+        <input type="text" id="postName" class="pm-input" placeholder="e.g. Samsung Galaxy A14">
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">Category</label>
+        <select id="postCategory" class="pm-input">
+          <option value="Electronics">📱 Electronics</option>
+          <option value="Clothes & Shoes">👟 Clothes & Shoes</option>
+          <option value="Furniture">🛋️ Furniture</option>
+          <option value="Books">📚 Books</option>
+          <option value="Kitchen">🍳 Kitchen</option>
+        </select>
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">Price (KSh)</label>
+        <input type="number" id="postPrice" class="pm-input" placeholder="e.g. 8500" min="0">
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">Seller Phone</label>
+        <input type="text" id="postPhone" class="pm-input" placeholder="e.g. 0712345678">
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">📸 Picha ya Bidhaa</label>
+        <div id="postUploadArea" class="pm-upload" onclick="openPostCloudinaryWidget()">
+          <div style="font-size:2rem;margin-bottom:6px;">🖼️</div>
+          <div style="font-size:0.85rem;color:#666;font-weight:500;">Bonyeza hapa ku-upload picha</div>
+          <div style="font-size:0.75rem;color:#aaa;margin-top:3px;">Powered by Cloudinary</div>
+        </div>
+        <div id="postPreviewContainer" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div id="postFormError" class="pm-error"></div>
+      <button class="pm-submit" onclick="submitPostItem()">✅ Ongeza Item</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
 
 <script>
-// ── Firebase Setup ──
+// All your original script with fixes applied
 const firebaseConfig = {
   apiKey: "AIzaSyBq42vxsEor4XQTQ0LnXhqR-SkxLWx5ZpA",
   authDomain: "kisii-uni-shop-a86e4.firebaseapp.com",
@@ -492,29 +683,42 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
-const welcomeRef = db.ref('welcomeMessage');   // Added for welcome message
+const welcomeRef = db.ref('welcomeMessage');
+const visitorsRef = db.ref('visitors');
 
-// ── CATEGORY EMOJIS ──
+const cloudName = "df9ulrvka";
+const uploadPreset = "kisii_preset";
+let postImages = [];
+
 const catEmoji = {
-  'Electronics': '📱',
-  'Clothes & Shoes': '👟',
-  'Furniture': '🛋️',
-  'Books': '📚',
-  'Kitchen': '🍳',
-  'default': '📦'
+  'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️',
+  'Books': '📚', 'Kitchen': '🍳', 'default': '📦'
 };
 
 function getEmoji(cat) {
   for (const key in catEmoji) {
-    if (cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
+    if (cat && cat.toLowerCase().includes(key.toLowerCase())) return catEmoji[key];
   }
   return catEmoji.default;
 }
 
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 let activeCategory = 'All';
 
-// ── Welcome Message Logic (Only new code) ──
+// FIXED Welcome Modal
 function loadWelcomeMessage() {
+  const seenToday = localStorage.getItem('welcomeSeenToday');
+  if (seenToday === new Date().toDateString()) return;
+
   welcomeRef.once('value', (snapshot) => {
     const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
     document.getElementById('welcomeMessage').textContent = msg;
@@ -527,7 +731,6 @@ function closeWelcomeModal() {
   localStorage.setItem('welcomeSeenToday', new Date().toDateString());
 }
 
-// ── Image Viewer Functions ──
 function viewImage(url) {
   const lb = document.getElementById('lightbox');
   const img = document.getElementById('lightboxImg');
@@ -542,19 +745,16 @@ function closeImage() {
   document.body.style.overflow = 'auto';
 }
 
-// ── Render Categories ──
 function renderCategories() {
   const cats = ['All', 'Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
   const container = document.getElementById('categoriesContainer');
-  
   container.innerHTML = cats.map(cat => `
-    <div class="cat-chip ${activeCategory === cat ? 'active' : ''}" onclick="setCategory('${cat}')">
-      <span class="emoji">${cat === 'All' ? '✨' : getEmoji(cat)}</span> ${cat}
+    <div class="cat-chip ${activeCategory === cat ? 'active' : ''}" onclick="setCategory('${sanitize(cat)}')">
+      <span class="emoji">${cat === 'All' ? '✨' : getEmoji(cat)}</span> ${sanitize(cat)}
     </div>
   `).join('');
 }
 
-// ── Load and Render Items ──
 function loadAndRenderItems() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const grid = document.getElementById('itemsGrid');
@@ -562,52 +762,46 @@ function loadAndRenderItems() {
 
   itemsRef.once('value', (snapshot) => {
     let items = [];
-    snapshot.forEach((child) => {
-      items.push(child.val());
-    });
+    snapshot.forEach((child) => { items.push(child.val()); });
 
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
     }
-    
     if (query) {
-      items = items.filter(i => 
-        i.name.toLowerCase().includes(query) || 
-        i.category.toLowerCase().includes(query)
+      items = items.filter(i =>
+        (i.name && i.name.toLowerCase().includes(query)) ||
+        (i.category && i.category.toLowerCase().includes(query))
       );
     }
 
     countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
 
     if (items.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <div class="big-emoji">🔍</div>
-          <h3>Hakuna items kwa sasa</h3>
-          <p>Try different category au search tena baadaye</p>
-        </div>`;
+      grid.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>Hakuna items kwa sasa</h3><p>Try different category au search tena baadaye</p></div>`;
       return;
     }
 
-    grid.innerHTML = items.map((item, idx) => `
+    grid.innerHTML = items.map((item, idx) => {
+      const safeName = sanitize(item.name || '');
+      const safeCategory = sanitize(item.category || '');
+      const waPhone = (item.phone || '').replace(/^0/, '').replace(/[^0-9]/g, '');
+      const imgUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
+      return `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${item.image ? 
-          `<img class="item-img" src="${item.image}" alt="${item.name}" onclick="viewImage('${item.image}')" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : 
-          ''}
-        <div class="item-img-placeholder" style="${item.image ? 'display:none' : 'display:flex'}">
+        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" onclick="viewImage('${imgUrl}')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+        <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}">
           ${getEmoji(item.category)}
         </div>
-        
         <div class="item-body">
-          <div class="item-category">${item.category}</div>
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>negotiable</span></div>
-          <a class="contact-btn" href="https://wa.me/254${item.phone.replace(/^0/, '')}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
+          <div class="item-category">${safeCategory}</div>
+          <div class="item-name">${safeName}</div>
+          <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>${item.negotiable ? 'negotiable' : ''}</span></div>
+          <a class="contact-btn" href="https://wa.me/254${waPhone}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
             📲 Wasiliana na Seller
           </a>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   });
 }
 
@@ -617,18 +811,122 @@ function setCategory(cat) {
   loadAndRenderItems();
 }
 
-function filterItems() {
-  loadAndRenderItems();
+function filterItems() { loadAndRenderItems(); }
+
+// Post Item Functions (fixed)
+function openPostCloudinaryWidget() {
+  const uploadArea = document.getElementById('postUploadArea');
+  if (typeof cloudinary === 'undefined') return;
+  const widget = cloudinary.createUploadWidget({
+    cloudName: cloudName,
+    uploadPreset: uploadPreset,
+    sources: ['local', 'camera'],
+    multiple: true,
+    maxFiles: 4,
+    clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
+    maxFileSize: 5000000
+  }, (error, result) => {
+    if (!error && result && result.event === "success") {
+      postImages.push(result.info.secure_url);
+      renderPostPreviews();
+    }
+  });
+  widget.open();
 }
 
-itemsRef.on('value', () => {
-  loadAndRenderItems();
-});
+function renderPostPreviews() {
+  const container = document.getElementById('postPreviewContainer');
+  container.innerHTML = postImages.map((url, i) => `
+    <div style="position:relative;width:80px;height:80px;">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+      <button onclick="removePostImage(${i})" style="position:absolute;top:-6px;right:-6px;background:red;color:white;border:none;width:20px;height:20px;border-radius:50%;font-size:12px;cursor:pointer;">×</button>
+    </div>
+  `).join('');
+}
 
-// Initial load
+function removePostImage(i) {
+  postImages.splice(i, 1);
+  renderPostPreviews();
+}
+
+function submitPostItem() {
+  const name = document.getElementById('postName').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const price = document.getElementById('postPrice').value.trim();
+  const phone = document.getElementById('postPhone').value.trim();
+  const errEl = document.getElementById('postFormError');
+
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+  }
+  errEl.style.display = 'none';
+
+  if (!name) { showError('⚠️ Weka jina la bidhaa.'); return; }
+  if (name.length > 100) { showError('⚠️ Jina ni ndefu sana. Max 100 characters.'); return; }
+  if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) { showError('⚠️ Bei si sahihi.'); return; }
+  if (!phone) { showError('⚠️ Weka namba ya simu.'); return; }
+  const cleanPhone = phone.replace(/\s/g, '');
+  if (!/^(07|01)\d{8}$/.test(cleanPhone)) { showError('⚠️ Namba ya simu si sahihi.'); return; }
+
+  const newItem = {
+    name, category,
+    price: parseFloat(price),
+    phone: cleanPhone,
+    images: postImages.length ? postImages : null,
+    negotiable: false,
+    addedAt: new Date().toISOString(),
+    postedBy: 'public'
+  };
+
+  itemsRef.push(newItem).then(() => {
+    document.getElementById('postModal').style.display = 'none';
+    document.getElementById('postName').value = '';
+    document.getElementById('postPrice').value = '';
+    document.getElementById('postPhone').value = '';
+    postImages = [];
+    renderPostPreviews();
+    showPageToast('✅ Item imewekwa successfully!');
+  }).catch(() => showError('❌ Hitilafu imetokea. Jaribu tena.'));
+}
+
+function showPageToast(msg) {
+  let t = document.getElementById('pageToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'pageToast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a7a3c;color:white;padding:12px 24px;border-radius:30px;font-weight:700;font-size:0.93rem;z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 3000);
+}
+
+itemsRef.on('value', () => { loadAndRenderItems(); });
+
 renderCategories();
 loadAndRenderItems();
-loadWelcomeMessage();   // ← Welcome popup added here
+loadWelcomeMessage();
+
+function incrementVisitorCount() {
+  const now = new Date();
+  const todayKey = now.toISOString().split('T')[0];
+  const lastVisitKey = 'kisii_visited_' + todayKey;
+  if (localStorage.getItem(lastVisitKey)) return;
+
+  const weekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000)).toString();
+  const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+  visitorsRef.child('today').child(todayKey).transaction(c => (c || 0) + 1);
+  visitorsRef.child('week').child(weekKey).transaction(c => (c || 0) + 1);
+  visitorsRef.child('month').child(monthKey).transaction(c => (c || 0) + 1);
+
+  localStorage.setItem(lastVisitKey, '1');
+}
+
+incrementVisitorCount();
 </script>
 </body>
 </html>
