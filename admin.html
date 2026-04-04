@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://upload-widget.cloudinary.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src * https: data: blob:; connect-src * https: wss:; frame-src https://upload-widget.cloudinary.com;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin – Kisii Uni Second-Hand</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -18,17 +19,13 @@
     --muted: #666;
     --border: #e0e0dc;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--grey);
     color: var(--text);
     min-height: 100vh;
   }
-
-  /* ── NAV ── */
   nav {
     background: var(--black);
     padding: 0 24px;
@@ -38,7 +35,6 @@
     height: 64px;
     border-bottom: 3px solid var(--yellow);
   }
-
   .logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
@@ -46,9 +42,7 @@
     color: var(--white);
     line-height: 1.1;
   }
-
   .logo span { color: var(--yellow); }
-
   .admin-badge {
     background: var(--yellow);
     color: var(--black);
@@ -58,45 +52,36 @@
     border-radius: 20px;
     letter-spacing: 0.05em;
   }
-
-  /* ── LAYOUT ── */
   .page-wrap {
     max-width: 1000px;
     margin: 0 auto;
     padding: 32px 24px 60px;
   }
-
   .page-title {
     font-family: 'Syne', sans-serif;
     font-size: 1.6rem;
     font-weight: 800;
     margin-bottom: 4px;
   }
-
   .page-sub {
     color: var(--muted);
     font-size: 0.9rem;
     margin-bottom: 28px;
   }
-
   .grid-two {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
-
   @media (max-width: 700px) {
     .grid-two { grid-template-columns: 1fr; }
   }
-
-  /* ── CARDS ── */
   .card {
     background: var(--card-bg);
     border-radius: 14px;
     border: 1.5px solid var(--border);
     padding: 24px;
   }
-
   .card-title {
     font-family: 'Syne', sans-serif;
     font-size: 1.05rem;
@@ -106,12 +91,9 @@
     align-items: center;
     gap: 8px;
   }
-
-  /* ── FORM ── */
   .field {
     margin-bottom: 14px;
   }
-
   label {
     display: block;
     font-size: 0.82rem;
@@ -121,10 +103,7 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
-
-  input[type=text],
-  input[type=number],
-  select {
+  input[type=text], input[type=number], select {
     width: 100%;
     padding: 11px 14px;
     border: 2px solid var(--border);
@@ -136,10 +115,7 @@
     outline: none;
     transition: border 0.2s;
   }
-
   input:focus, select:focus { border-color: var(--green); }
-
-  /* ── IMAGE UPLOAD ── */
   .image-upload-area {
     border: 2px dashed var(--border);
     border-radius: 10px;
@@ -150,12 +126,10 @@
     position: relative;
     background: #fafafa;
   }
-
   .image-upload-area:hover {
     border-color: var(--green);
     background: #f0faf4;
   }
-
   .upload-placeholder {
     display: flex;
     flex-direction: column;
@@ -163,21 +137,16 @@
     gap: 6px;
     pointer-events: none;
   }
-
   .upload-placeholder .upload-icon { font-size: 2rem; }
   .upload-placeholder .upload-text { font-size: 0.85rem; color: var(--muted); }
   .upload-placeholder .upload-hint { font-size: 0.75rem; color: #aaa; }
-
-  /* ── IMAGE PREVIEW ── */
   .image-preview-wrap {
     display: none;
     position: relative;
     border-radius: 10px;
     overflow: hidden;
   }
-
   .image-preview-wrap.has-image { display: block; }
-
   .image-preview-wrap img {
     width: 100%;
     height: 160px;
@@ -185,7 +154,6 @@
     display: block;
     border-radius: 8px;
   }
-
   .remove-preview-btn {
     position: absolute;
     top: 8px;
@@ -203,12 +171,8 @@
     justify-content: center;
     transition: background 0.2s;
   }
-
   .remove-preview-btn:hover { background: var(--red); }
-
   .image-upload-area.hidden { display: none; }
-
-  /* ── BTN ── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -222,26 +186,12 @@
     border: none;
     transition: opacity 0.2s, transform 0.1s;
   }
-
   .btn:active { transform: scale(0.97); }
   .btn:hover { opacity: 0.88; }
-
   .btn-green { background: var(--green); color: white; width: 100%; justify-content: center; margin-top: 4px; }
   .btn-yellow { background: var(--yellow); color: var(--black); }
   .btn-red { background: var(--red); color: white; }
   .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
-
-  /* ── PROGRESS ── */
-  .upload-progress {
-    display: none;
-    font-size: 0.8rem;
-    color: var(--green);
-    margin-top: 6px;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  /* ── TOAST ── */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -258,12 +208,8 @@
     z-index: 999;
     pointer-events: none;
   }
-
   .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── ITEMS LIST ── */
   .items-list { display: flex; flex-direction: column; gap: 10px; }
-
   .admin-item {
     display: flex;
     align-items: center;
@@ -273,12 +219,10 @@
     padding: 12px;
     animation: fadeIn 0.3s ease both;
   }
-
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .admin-item-img {
     width: 52px;
     height: 52px;
@@ -286,17 +230,9 @@
     object-fit: cover;
     background: var(--border);
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-    overflow: hidden;
   }
-
   .admin-item-img img { width: 100%; height: 100%; object-fit: cover; }
-
   .admin-item-info { flex: 1; min-width: 0; }
-
   .admin-item-name {
     font-weight: 700;
     font-size: 0.93rem;
@@ -304,19 +240,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .admin-item-meta { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-
   .admin-item-price { font-weight: 700; color: var(--red); font-size: 0.93rem; white-space: nowrap; }
-
-  /* ── STATS BAR ── */
   .stats-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     margin-bottom: 24px;
   }
-
   .stat-card {
     background: var(--card-bg);
     border-radius: 10px;
@@ -324,16 +255,13 @@
     padding: 16px;
     text-align: center;
   }
-
   .stat-number {
     font-family: 'Syne', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--green);
   }
-
   .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-
   .site-link-bar {
     background: var(--green);
     color: white;
@@ -346,15 +274,12 @@
     flex-wrap: wrap;
     gap: 10px;
   }
-
   .site-link-bar a {
     color: var(--yellow);
     font-weight: 700;
     text-decoration: none;
     font-size: 0.9rem;
   }
-
-  /* ── CATEGORY LIST UI ── */
   .cat-manager-list {
     margin-top: 15px;
     display: flex;
@@ -378,19 +303,42 @@
     font-weight: 800;
     padding: 2px 8px;
   }
-
-  .empty-msg {
-    text-align: center;
-    padding: 30px;
-    color: var(--muted);
-    font-size: 0.9rem;
+  #passwordGate {
+    position: fixed; inset: 0; background: var(--black);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
   }
-
-  .empty-msg .e { font-size: 2rem; margin-bottom: 8px; }
-
+  #passwordGate.hidden { display: none; }
+  .gate-box {
+    background: #1a1a1a; border: 1.5px solid #333; border-radius: 14px;
+    padding: 36px 32px; width: 100%; max-width: 360px; text-align: center;
+  }
+  .gate-logo { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+  .gate-logo span { color: var(--yellow); }
+  .gate-sub { font-size: 0.82rem; color: #888; margin-bottom: 28px; }
+  .gate-input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid #333; background: #111; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; margin-bottom: 10px; transition: border 0.2s; }
+  .gate-input:focus { border-color: var(--yellow); }
+  .gate-btn { width: 100%; padding: 12px; background: var(--yellow); color: var(--black); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: opacity 0.2s; }
+  .gate-btn:hover { opacity: 0.88; }
+  .gate-error { font-size: 0.82rem; color: var(--red); margin-top: 10px; min-height: 18px; }
+  #pageContent { display: none; }
 </style>
 </head>
 <body>
+
+<!-- Password Gate -->
+<div id="passwordGate">
+  <div class="gate-box">
+    <div class="gate-logo">KISII UNI <span>ADMIN</span></div>
+    <div class="gate-sub">Sign in to access the admin panel</div>
+    <input class="gate-input" type="email" id="gateEmail" placeholder="Email address" onkeydown="if(event.key==='Enter') document.getElementById('gatePass').focus()"/>
+    <input class="gate-input" type="password" id="gatePass" placeholder="Password" onkeydown="if(event.key==='Enter') adminLogin()"/>
+    <button class="gate-btn" id="loginBtn" onclick="adminLogin()">Sign In</button>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
+<!-- Main Admin Panel -->
+<div id="pageContent">
 
 <nav>
   <div class="logo">KISII UNI<br><span>ADMIN PANEL</span></div>
@@ -399,7 +347,7 @@
 
 <div class="page-wrap">
 
-  <!-- ====================== DAILY WELCOME MESSAGE (Only addition) ====================== -->
+  <!-- Daily Welcome Message -->
   <div class="card">
     <div class="card-title">✍️ Daily Welcome Message</div>
     <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">
@@ -408,7 +356,25 @@
     <textarea id="welcomeInput" rows="4" style="width:100%; padding:14px; border:2px solid var(--border); border-radius:10px; font-size:1rem; resize:vertical;"></textarea>
     <button class="btn btn-green" onclick="saveWelcomeMessage()" style="margin-top:14px;">💾 Save New Message</button>
   </div>
-  <!-- ====================== END OF NEW SECTION ====================== -->
+
+  <!-- Visitor Analytics -->
+  <div class="card">
+    <div class="card-title">📊 Visitor Analytics</div>
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-number" id="visitorsToday">0</div>
+        <div class="stat-label">Visitors Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="visitorsWeek">0</div>
+        <div class="stat-label">This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="visitorsMonth">0</div>
+        <div class="stat-label">This Month</div>
+      </div>
+    </div>
+  </div>
 
   <div class="page-title">🛠️ Manage Biashara</div>
   <div class="page-sub">Add items, remove sold items, and manage listings.</div>
@@ -418,6 +384,7 @@
     <a href="index.html" target="_blank">index.html → View Customer Site ↗</a>
   </div>
 
+  <!-- Main Stats -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="stat-number" id="statItems">0</div>
@@ -434,29 +401,13 @@
   </div>
 
   <div class="grid-two">
+    <!-- Add Item -->
     <div class="card">
       <div class="card-title">➕ Ongeza Item Mpya</div>
-
-      <div class="field">
-        <label>Item Name</label>
-        <input type="text" id="iName" placeholder="e.g. Samsung Galaxy A14"/>
-      </div>
-
-      <div class="field">
-        <label>Category</label>
-        <select id="iCategory"></select>
-      </div>
-
-      <div class="field">
-        <label>Price (KSh)</label>
-        <input type="number" id="iPrice" placeholder="e.g. 8500" min="0"/>
-      </div>
-
-      <div class="field">
-        <label>Seller Phone</label>
-        <input type="text" id="iPhone" placeholder="e.g. 0712345678"/>
-      </div>
-
+      <div class="field"><label>Item Name</label><input type="text" id="iName" placeholder="e.g. Samsung Galaxy A14"/></div>
+      <div class="field"><label>Category</label><select id="iCategory"></select></div>
+      <div class="field"><label>Price (KSh)</label><input type="number" id="iPrice" placeholder="e.g. 8500" min="0"/></div>
+      <div class="field"><label>Seller Phone</label><input type="text" id="iPhone" placeholder="e.g. 0712345678"/></div>
       <div class="field">
         <label>📸 Picha ya Bidhaa</label>
         <div class="image-upload-area" id="uploadArea" onclick="openCloudinaryWidget()">
@@ -466,31 +417,24 @@
             <span class="upload-hint">Powered by Cloudinary</span>
           </div>
         </div>
-
         <div class="image-preview-wrap" id="previewWrap">
           <img id="previewImg" src="" alt="Preview"/>
           <button class="remove-preview-btn" onclick="removeImage()">✕</button>
         </div>
       </div>
-
       <button class="btn btn-green" onclick="addItem()">✅ Ongeza Item</button>
     </div>
 
+    <!-- Manage Categories -->
     <div class="card">
       <div class="card-title">📁 Manage Categories</div>
-      <div class="field">
-        <label>New Category Name</label>
-        <input type="text" id="newCatInput" placeholder="e.g. Sports"/>
-      </div>
+      <div class="field"><label>New Category Name</label><input type="text" id="newCatInput" placeholder="e.g. Sports"/></div>
       <button class="btn btn-yellow" style="width:100%; justify-content:center; margin-bottom:18px;" onclick="addNewCategory()">➕ Add Category</button>
-      
       <label>Existing Categories</label>
       <div class="cat-manager-list" id="catManagerList"></div>
-
       <div class="card-title" style="margin-top:20px">📊 Quick Tips</div>
       <p style="font-size:0.85rem;color:var(--muted);line-height:1.7">
         • Images are hosted on Cloudinary for free<br>
-        • 40,000 visitors per month supported via Cloudflare<br>
         • Always remove sold items to keep the list fresh.
       </p>
     </div>
@@ -506,11 +450,12 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
 
 <script>
-// ── Firebase Configuration ──
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBq42vxsEor4XQTQ0LnXhqR-SkxLWx5ZpA",
   authDomain: "kisii-uni-shop-a86e4.firebaseapp.com",
@@ -524,21 +469,29 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const itemsRef = db.ref('items');
-const welcomeRef = db.ref('welcomeMessage');   // ← Added for welcome message
+const welcomeRef = db.ref('welcomeMessage');
+const visitorsRef = db.ref('visitors');
 
-// ── Cloudinary Config ──
-const cloudName = "df9ulrvka"; 
-const uploadPreset = "kisii_preset"; 
+const cloudName = "df9ulrvka";
+const uploadPreset = "kisii_preset";
 
 let currentImageUrl = '';
-
-// ── UI Helpers ──
 let FIXED_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
 const CORE_CATS = ['Electronics', 'Clothes & Shoes', 'Furniture', 'Books', 'Kitchen'];
 const catEmoji = {'Electronics': '📱', 'Clothes & Shoes': '👟', 'Furniture': '🛋️', 'Books': '📚', 'Kitchen': '🍳', 'default': '📦'};
 
 function getEmoji(cat) {
   return catEmoji[cat] || catEmoji.default;
+}
+
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 function toast(msg, isError = false) {
@@ -549,28 +502,40 @@ function toast(msg, isError = false) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── New: Welcome Message Functions ──
+// Welcome Message
 function saveWelcomeMessage() {
   const message = document.getElementById('welcomeInput').value.trim();
   if (!message) return toast("Message cannot be empty!", true);
-  
-  welcomeRef.set(message).then(() => {
-    toast("✅ Daily welcome message saved successfully!");
+  welcomeRef.set(message).then(() => toast("✅ Daily welcome message saved successfully!")).catch(() => toast("Failed to save message", true));
+}
+
+welcomeRef.once('value', (snapshot) => {
+  document.getElementById('welcomeInput').value = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
+});
+
+// Visitor Stats
+function loadVisitorStats() {
+  const now = new Date();
+  const todayKey = now.toISOString().split('T')[0];
+  const weekKey = Math.floor(now.getTime() / (7 * 24 * 60 * 60 * 1000)).toString();
+  const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+  visitorsRef.child('today').child(todayKey).once('value', s => {
+    document.getElementById('visitorsToday').textContent = s.val() || 0;
+  });
+  visitorsRef.child('week').child(weekKey).once('value', s => {
+    document.getElementById('visitorsWeek').textContent = s.val() || 0;
+  });
+  visitorsRef.child('month').child(monthKey).once('value', s => {
+    document.getElementById('visitorsMonth').textContent = s.val() || 0;
   });
 }
 
-// Load current message
-welcomeRef.once('value', (snapshot) => {
-  const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
-  document.getElementById('welcomeInput').value = msg;
-});
-
-// ── Category Logic ──
+// Category Management
 function addNewCategory() {
   const val = document.getElementById('newCatInput').value.trim();
   if(!val) return toast("Enter category name", true);
   if(FIXED_CATS.includes(val)) return toast("Category exists", true);
-  
   FIXED_CATS.push(val);
   document.getElementById('newCatInput').value = '';
   updateCatDropdown();
@@ -578,9 +543,7 @@ function addNewCategory() {
 }
 
 function removeCategory(catName) {
-  if (CORE_CATS.includes(catName)) {
-    return toast("Cannot delete core category!", true);
-  }
+  if (CORE_CATS.includes(catName)) return toast("Cannot delete core category!", true);
   if (confirm(`Ondoa category ya "${catName}"?`)) {
     FIXED_CATS = FIXED_CATS.filter(c => c !== catName);
     updateCatDropdown();
@@ -590,27 +553,28 @@ function removeCategory(catName) {
 
 function updateCatDropdown() {
   const sel = document.getElementById('iCategory');
-  sel.innerHTML = FIXED_CATS.map(c => `<option value="${c}">${getEmoji(c)} ${c}</option>`).join('');
-  
+  sel.innerHTML = FIXED_CATS.map(c => `<option value="${sanitize(c)}">${getEmoji(c)} ${sanitize(c)}</option>`).join('');
   document.getElementById('statCats').textContent = FIXED_CATS.length;
 
   const managerList = document.getElementById('catManagerList');
   managerList.innerHTML = FIXED_CATS.map(c => `
     <div class="cat-item">
-      <span>${getEmoji(c)} ${c}</span>
-      ${!CORE_CATS.includes(c) ? `<button class="del-cat-btn" onclick="removeCategory('${c}')">✕</button>` : '<small style="color:#aaa">Core</small>'}
+      <span>${getEmoji(c)} ${sanitize(c)}</span>
+      ${!CORE_CATS.includes(c) ? `<button class="del-cat-btn" onclick="removeCategory('${sanitize(c)}')">✕</button>` : '<small style="color:#aaa">Core</small>'}
     </div>
   `).join('');
 }
 
-// ── Cloudinary Upload Widget ──
+// Cloudinary Upload
 function openCloudinaryWidget() {
-  cloudinary.openUploadWidget({
+  if (typeof cloudinary === 'undefined') return toast('Upload widget failed to load. Please refresh.', true);
+  const widget = cloudinary.createUploadWidget({
     cloudName: cloudName,
     uploadPreset: uploadPreset,
     sources: ['local', 'camera'],
     multiple: false,
-    clientAllowedFormats: ["png", "jpg", "jpeg", "webp"]
+    clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
+    maxFileSize: 5000000
   }, (error, result) => {
     if (!error && result && result.event === "success") {
       currentImageUrl = result.info.secure_url;
@@ -618,8 +582,11 @@ function openCloudinaryWidget() {
       document.getElementById('previewWrap').classList.add('has-image');
       document.getElementById('uploadArea').classList.add('hidden');
       toast('✅ Picha imepakiwa!');
+    } else if (error) {
+      toast('Upload failed. Try again.', true);
     }
   });
+  widget.open();
 }
 
 function removeImage() {
@@ -628,23 +595,27 @@ function removeImage() {
   document.getElementById('uploadArea').classList.remove('hidden');
 }
 
-// ── Add Item ──
+// Add Item
 function addItem() {
   const name = document.getElementById('iName').value.trim();
   const category = document.getElementById('iCategory').value;
   const price = document.getElementById('iPrice').value.trim();
   const phone = document.getElementById('iPhone').value.trim();
 
-  if (!name || !price || !phone) {
-    toast('⚠️ Jaza sehemu zote!', true); return;
-  }
+  if (!name) return toast('⚠️ Weka jina la bidhaa!', true);
+  if (name.length > 100) return toast('⚠️ Jina ni ndefu sana.', true);
+  if (!price || isNaN(parseFloat(price)) || parseFloat(price) <= 0) return toast('⚠️ Bei si sahihi.', true);
+  if (!phone) return toast('⚠️ Weka namba ya simu!', true);
+
+  const cleanPhone = phone.replace(/\s/g, '');
+  if (!/^(07|01)\d{8}$/.test(cleanPhone)) return toast('⚠️ Simu lazima ianze 07/01 na iwe na digits 10.', true);
 
   const newItem = {
     id: Date.now(),
     name,
     category,
     price: parseFloat(price),
-    phone,
+    phone: cleanPhone,
     image: currentImageUrl,
     addedAt: new Date().toLocaleDateString('en-KE')
   };
@@ -656,7 +627,7 @@ function addItem() {
     document.getElementById('iPhone').value = '';
     removeImage();
     renderAll();
-  });
+  }).catch(() => toast("Failed to add item", true));
 }
 
 function removeItem(key) {
@@ -682,31 +653,81 @@ function renderAll() {
     });
 
     document.getElementById('statItems').textContent = items.length;
-    
+    document.getElementById('listedCount').textContent = `(${items.length})`;
+
     const avg = items.length > 0 ? Math.round(totalPrice / items.length) : 0;
     document.getElementById('statPrice').textContent = avg.toLocaleString();
 
     updateCatDropdown();
 
     const listEl = document.getElementById('adminItemsList');
-    listEl.innerHTML = items.map((item, idx) => `
+    listEl.innerHTML = items.map((item, idx) => {
+      const safeName = sanitize(item.name || '');
+      const safeCategory = sanitize(item.category || '');
+      const safePhone = sanitize(item.phone || '');
+      const safePrice = sanitize(String(item.price || 0));
+      const imgUrl = item.image || (item.images && item.images[0]) || '';
+      const safeKey = sanitize(keys[idx]);
+      return `
       <div class="admin-item">
         <div class="admin-item-img">
-          ${item.image ? `<img src="${item.image}"/>` : getEmoji(item.category)}
+          ${imgUrl ? `<img src="${imgUrl}"/>` : getEmoji(item.category)}
         </div>
         <div class="admin-item-info">
-          <div class="admin-item-name">${item.name}</div>
-          <div class="admin-item-meta">${item.category} • ${item.phone}</div>
+          <div class="admin-item-name">${safeName}</div>
+          <div class="admin-item-meta">${safeCategory} • ${safePhone}</div>
         </div>
-        <div class="admin-item-price">KSh ${item.price}</div>
-        <button class="btn btn-red btn-sm" onclick="removeItem('${keys[idx]}')">🗑️ Sold</button>
-      </div>
-    `).join('');
+        <div class="admin-item-price">KSh ${safePrice}</div>
+        <button class="btn btn-red btn-sm" onclick="removeItem('${safeKey}')">🗑️ Sold</button>
+      </div>`;
+    }).join('');
   });
 }
 
-renderAll();
-updateCatDropdown();
+// Authentication
+const auth = firebase.auth();
+
+function adminLogin() {
+  const email = document.getElementById('gateEmail').value.trim();
+  const pass = document.getElementById('gatePass').value;
+  const errEl = document.getElementById('gateError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!email || !pass) {
+    errEl.textContent = 'Please enter your email and password.';
+    return;
+  }
+
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+  errEl.textContent = '';
+
+  auth.signInWithEmailAndPassword(email, pass).catch(() => {
+    btn.textContent = 'Sign In';
+    btn.disabled = false;
+    errEl.textContent = 'Incorrect email or password.';
+    document.getElementById('gatePass').value = '';
+  });
+}
+
+let adminInitialized = false;
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    document.getElementById('passwordGate').classList.add('hidden');
+    document.getElementById('pageContent').style.display = 'block';
+    if (!adminInitialized) {
+      adminInitialized = true;
+      renderAll();
+      updateCatDropdown();
+      loadVisitorStats();
+    }
+  } else {
+    document.getElementById('passwordGate').classList.remove('hidden');
+    document.getElementById('pageContent').style.display = 'none';
+    adminInitialized = false;
+  }
+});
 </script>
+</div>
 </body>
 </html>
