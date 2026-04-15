@@ -324,6 +324,7 @@
 </style>
 </head>
 <body>
+<div id="debugToast"></div>
 
 <!-- Password Gate -->
 <div id="passwordGate">
@@ -502,6 +503,19 @@ function toast(msg, isError = false) {
   setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+function showDebug(msg) {
+  const t = document.getElementById('debugToast');
+  if (!t) return;
+  t.textContent = "DEBUG: " + msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 6000);
+}
+
+window.onerror = function(msg, url, line) {
+  showDebug(`${msg} (Line ${line})`);
+  return false;
+};
+
 // Welcome Message
 function saveWelcomeMessage() {
   const message = document.getElementById('welcomeInput').value.trim();
@@ -601,6 +615,7 @@ function addItem() {
   const category = document.getElementById('iCategory').value;
   const price = document.getElementById('iPrice').value.trim();
   const phone = document.getElementById('iPhone').value.trim();
+  const location = 'Main Campus'; // Default for admin for now
 
   if (!name) return toast('⚠️ Weka jina la bidhaa!', true);
   if (name.length > 100) return toast('⚠️ Jina ni ndefu sana.', true);
@@ -617,7 +632,9 @@ function addItem() {
     price: parseFloat(price),
     phone: cleanPhone,
     image: currentImageUrl,
-    addedAt: new Date().toLocaleDateString('en-KE')
+    location,
+    addedAt: new Date().toISOString(),
+    sold: false
   };
 
   itemsRef.push(newItem).then(() => {
@@ -631,7 +648,7 @@ function addItem() {
 }
 
 function removeItem(key) {
-  if (confirm('Ondoa item hii?')) {
+  if (confirm('Delete this item permanently?')) {
     itemsRef.child(key).remove().then(() => {
       toast('🗑️ Item removed.');
       renderAll();
@@ -639,13 +656,29 @@ function removeItem(key) {
   }
 }
 
-function renderAll() {
-  itemsRef.once('value', (snapshot) => {
-    let items = [];
-    let keys = [];
-    let totalPrice = 0;
+function toggleSoldAdmin(key, currentState) {
+  itemsRef.child(key).update({ sold: !currentState }).then(() => {
+    toast(`Item marked as ${!currentState ? 'Sold' : 'Available'}`);
+    renderAll();
+  });
+}
 
-    snapshot.forEach(child => {
+function renderAll() {
+  try {
+    itemsRef.once('value', (snapshot) => {
+      try {
+        let items = [];
+        let keys = [];
+        let totalPrice = 0;
+
+        if (!snapshot.exists()) {
+          document.getElementById('statItems').textContent = "0";
+          document.getElementById('listedCount').textContent = "(0)";
+          document.getElementById('adminItemsList').innerHTML = "No items yet.";
+          return;
+        }
+
+        snapshot.forEach(child => {
       const data = child.val();
       items.push(data);
       keys.push(child.key);
@@ -668,20 +701,35 @@ function renderAll() {
       const safePrice = sanitize(String(item.price || 0));
       const imgUrl = item.image || (item.images && item.images[0]) || '';
       const safeKey = sanitize(keys[idx]);
+      const isSold = !!item.sold;
       return `
-      <div class="admin-item">
+      <div class="admin-item" style="${isSold ? 'opacity:0.6;' : ''}">
         <div class="admin-item-img">
           ${imgUrl ? `<img src="${imgUrl}"/>` : getEmoji(item.category)}
         </div>
         <div class="admin-item-info">
-          <div class="admin-item-name">${safeName}</div>
+          <div class="admin-item-name">${safeName} ${isSold ? '<span style="color:red">[SOLD]</span>' : ''}</div>
           <div class="admin-item-meta">${safeCategory} • ${safePhone}</div>
         </div>
         <div class="admin-item-price">KSh ${safePrice}</div>
-        <button class="btn btn-red btn-sm" onclick="removeItem('${safeKey}')">🗑️ Sold</button>
+        <div style="display:flex; gap:5px;">
+          <button class="btn ${isSold ? 'btn-yellow' : 'btn-sm'}" onclick="toggleSoldAdmin('${safeKey}', ${isSold})">
+            ${isSold ? 'Relist' : 'Sold'}
+          </button>
+          <button class="btn btn-red btn-sm" onclick="removeItem('${safeKey}')">✕</button>
+        </div>
       </div>`;
     }).join('');
+    
+    } catch(err) {
+      showDebug("Render Error: " + err.message);
+    }
+  }, (err) => {
+    showDebug("Firebase Error: " + err.message);
   });
+  } catch(e) {
+    showDebug("Admin Load Error: " + e.message);
+  }
 }
 
 // Authentication
