@@ -923,8 +923,8 @@ function loadAndRenderItems() {
 
   console.log('Fetching items from Firebase...');
 
-  itemsRef.once('value', (snapshot) => {
-    console.log('Firebase callback executed');
+  itemsRef.once('value').then((snapshot) => {
+    console.log('Firebase .then() executed');
     let items = [];
     
     if (!snapshot) {
@@ -1006,12 +1006,12 @@ function loadAndRenderItems() {
     }).join('');
     
     console.log('=== Items rendered successfully ===');
-  }, (error) => {
+  }).catch((error) => {
     console.error('Firebase error:', error);
     grid.innerHTML = `<div class="empty-state">
       <div class="big-emoji">⚠️</div>
-      <h3>Hitilafu ya mtandao</h3>
-      <p>Could not load items. Error: ${error.message}</p>
+      <h3>Firebase Error</h3>
+      <p>${error.message}</p>
       <button onclick="loadAndRenderItems()" style="margin-top:20px;padding:12px 24px;background:var(--green);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Try Again</button>
     </div>`;
   });
