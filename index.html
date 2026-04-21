@@ -915,11 +915,27 @@ function loadAndRenderItems() {
     return;
   }
 
-  itemsRef.once('value', (snapshot) => {
+  itemsRef.once('value').then((snapshot) => {
     let items = [];
-    snapshot.forEach((child) => { items.push({...child.val(), id: child.key}); });
     
-    console.log('Fetched items:', items.length);
+    if (!snapshot || !snapshot.exists()) {
+      console.log('No items in database');
+      grid.innerHTML = `<div class="empty-state">
+        <div class="big-emoji">📭</div>
+        <h3>Hakuna items kwa sasa</h3>
+        <p>Database is empty. Be the first to post an item!</p>
+        <button onclick="document.getElementById('postModal').style.display='flex'" style="margin-top:20px;padding:12px 24px;background:var(--green);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Post First Item</button>
+      </div>`;
+      countEl.innerHTML = `<strong>0</strong> items found`;
+      return;
+    }
+    
+    snapshot.forEach((child) => { 
+      const val = child.val();
+      if (val) items.push({...val, id: child.key}); 
+    });
+    
+    console.log('Fetched items:', items.length, items);
 
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
@@ -937,6 +953,15 @@ function loadAndRenderItems() {
       grid.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>Hakuna items kwa sasa</h3><p>Try different category au search tena baadaye</p></div>`;
       return;
     }
+  }).catch((error) => {
+    console.error('Firebase error:', error);
+    grid.innerHTML = `<div class="empty-state">
+      <div class="big-emoji">⚠️</div>
+      <h3>Hitilafu ya mtandao</h3>
+      <p>Could not load items. Error: ${error.message}</p>
+      <button onclick="loadAndRenderItems()" style="margin-top:20px;padding:12px 24px;background:var(--green);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Try Again</button>
+    </div>`;
+  });
 
     grid.innerHTML = items.map((item, idx) => {
       const safeName = sanitize(item.name || '');
