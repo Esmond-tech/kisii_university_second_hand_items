@@ -897,10 +897,16 @@ function renderCategories() {
 }
 
 function loadAndRenderItems() {
+  console.log('=== loadAndRenderItems() STARTED ===');
   const query = document.getElementById('searchInput').value.toLowerCase().trim()
     || document.getElementById('searchInputSticky').value.toLowerCase().trim();
   const grid = document.getElementById('itemsGrid');
   const countEl = document.getElementById('itemsCount');
+
+  if (!grid) {
+    console.error('ERROR: itemsGrid element not found!');
+    return;
+  }
 
   showSkeletons(6);
   
@@ -915,10 +921,25 @@ function loadAndRenderItems() {
     return;
   }
 
+  console.log('Fetching items from Firebase...');
+
   itemsRef.once('value', (snapshot) => {
+    console.log('Firebase callback executed');
     let items = [];
     
-    if (!snapshot || !snapshot.exists()) {
+    if (!snapshot) {
+      console.error('ERROR: snapshot is null');
+      grid.innerHTML = `<div class="empty-state">
+        <div class="big-emoji">📭</div>
+        <h3>Database Error</h3>
+        <p>Could not fetch items. Please try again.</p>
+      </div>`;
+      return;
+    }
+    
+    console.log('Snapshot exists:', snapshot.exists());
+    
+    if (!snapshot.exists()) {
       console.log('No items in database');
       grid.innerHTML = `<div class="empty-state">
         <div class="big-emoji">📭</div>
@@ -930,12 +951,16 @@ function loadAndRenderItems() {
       return;
     }
     
+    console.log('Processing snapshot...');
     snapshot.forEach((child) => { 
       const val = child.val();
-      if (val) items.push({...val, id: child.key}); 
+      if (val) {
+        val.id = child.key;
+        items.push(val); 
+      }
     });
     
-    console.log('Fetched items:', items.length, items);
+    console.log('Items fetched:', items.length);
 
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
@@ -950,15 +975,19 @@ function loadAndRenderItems() {
     countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
 
     if (items.length === 0) {
+      console.log('No items after filtering');
       grid.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>Hakuna items kwa sasa</h3><p>Try different category au search tena baadaye</p></div>`;
       return;
     }
+
+    console.log('Rendering', items.length, 'items...');
 
     grid.innerHTML = items.map((item, idx) => {
       const safeName = sanitize(item.name || '');
       const safeCategory = sanitize(item.category || '');
       const waPhone = (item.phone || '').replace(/^0/, '').replace(/[^0-9]/g, '');
       const imgUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
+      console.log('Item', idx, ':', safeName, 'Image:', imgUrl ? 'YES' : 'NO');
       return `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
         ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" loading="lazy" onclick="viewImage('${imgUrl}')" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" onload="this.classList.add('loaded')">` : ''}
@@ -975,6 +1004,8 @@ function loadAndRenderItems() {
         </div>
       </div>`;
     }).join('');
+    
+    console.log('=== Items rendered successfully ===');
   }, (error) => {
     console.error('Firebase error:', error);
     grid.innerHTML = `<div class="empty-state">
