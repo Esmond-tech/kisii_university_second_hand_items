@@ -830,58 +830,86 @@ function deleteSelected() {
     return;
   }
   
-  // Disable button during deletion
   const btn = document.getElementById('bulkDeleteBtn');
   btn.disabled = true;
   btn.textContent = 'Deleting...';
   
-  // Delete all items
-  const updates = {};
-  keysToDelete.forEach(key => {
-    updates[key] = null;
+  // Delete items one by one
+  let deleted = 0;
+  let errors = 0;
+  
+  const deletePromises = keysToDelete.map(key => {
+    return itemsRef.child(key).remove()
+      .then(() => { deleted++; })
+      .catch(err => { errors++; console.error('Error deleting', key, err); });
   });
   
-  itemsRef.parent.update(updates)
-    .then(() => {
-      toast(`✅ Deleted ${keysToDelete.length} items`);
-      renderAll();
-    })
-    .catch(err => {
-      toast('❌ Error: ' + err.message, true);
-      btn.disabled = false;
-      updateBulkDeleteButton();
-    });
+  Promise.all(deletePromises).then(() => {
+    if (errors === 0) {
+      toast(`✅ Deleted ${deleted} items`);
+    } else {
+      toast(`⚠️ Deleted ${deleted} items, ${errors} failed`, true);
+    }
+    renderAll();
+  }).catch(err => {
+    toast('❌ Error: ' + err.message, true);
+    btn.disabled = false;
+    updateBulkDeleteButton();
+  });
 }
 
 // Delete all test items function
 function deleteAllTestItems() {
-  if (!confirm('Delete ALL items with "Test" in the name? This will delete all test items at once.')) {
+  if (!confirm('Delete ALL items with "Test" in the name? This will delete all test items one by one.')) {
     return;
   }
   
+  const btn = document.querySelector('button[onclick="deleteAllTestItems()"]');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Deleting test items...';
+  
   itemsRef.once('value').then(snapshot => {
-    const updates = {};
-    let count = 0;
+    const keysToDelete = [];
     
     snapshot.forEach(child => {
       const item = child.val();
       if (item && item.name && item.name.includes('Test')) {
-        updates[child.key] = null;
-        count++;
+        keysToDelete.push(child.key);
       }
     });
     
-    if (count === 0) {
+    if (keysToDelete.length === 0) {
       toast('No test items found');
+      btn.disabled = false;
+      btn.textContent = originalText;
       return;
     }
     
-    itemsRef.parent.update(updates)
-      .then(() => {
-        toast(`✅ Deleted ${count} test items!`);
-        renderAll();
-      })
-      .catch(err => toast('❌ Error: ' + err.message, true));
+    let deleted = 0;
+    let errors = 0;
+    
+    // Delete items one by one with Promise.all
+    const deletePromises = keysToDelete.map(key => {
+      return itemsRef.child(key).remove()
+        .then(() => { deleted++; })
+        .catch(err => { errors++; console.error('Error deleting', key, err); });
+    });
+    
+    Promise.all(deletePromises).then(() => {
+      if (errors === 0) {
+        toast(`✅ Deleted ${deleted} test items!`);
+      } else {
+        toast(`⚠️ Deleted ${deleted} items, ${errors} failed`, true);
+      }
+      btn.disabled = false;
+      btn.textContent = originalText;
+      renderAll();
+    });
+  }).catch(err => {
+    toast('❌ Error: ' + err.message, true);
+    btn.disabled = false;
+    btn.textContent = originalText;
   });
 }
 </script>
