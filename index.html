@@ -833,26 +833,28 @@ function showSkeletons(count = 6) {
 
 // FIXED Welcome Modal - Shows immediately, items load in background
 function loadWelcomeMessage() {
-  // Show modal immediately without checking localStorage (for testing)
-  // Change to 'if (seenToday === new Date().toDateString()) return;' for production
-  const seenToday = localStorage.getItem('welcomeSeenToday');
+  // Show modal IMMEDIATELY - don't wait for Firebase
+  const modal = document.getElementById('welcomeModal');
+  const messageEl = document.getElementById('welcomeMessage');
   
-  welcomeRef.once('value', (snapshot) => {
-    const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
-    const modal = document.getElementById('welcomeModal');
-    const messageEl = document.getElementById('welcomeMessage');
-    
-    if (messageEl) messageEl.textContent = msg;
-    if (modal) {
-      modal.style.display = 'flex';
-      // Ensure modal is on top
-      modal.style.zIndex = '9999';
-    }
-    
-    // Start loading items immediately in background
-    // This happens WHILE user reads the welcome message
-    console.log('Welcome modal shown, starting item load in background...');
-  });
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.style.zIndex = '9999';
+    console.log('Welcome modal shown immediately');
+  }
+  
+  // Then try to fetch custom message from Firebase
+  if (typeof welcomeRef !== 'undefined' && welcomeRef) {
+    welcomeRef.once('value', (snapshot) => {
+      const msg = snapshot.val();
+      if (msg && messageEl) {
+        messageEl.textContent = msg;
+        console.log('Custom welcome message loaded');
+      }
+    }).catch((err) => {
+      console.log('Using default welcome message');
+    });
+  }
 }
 
 function closeWelcomeModal() {
