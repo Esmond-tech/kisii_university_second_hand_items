@@ -354,6 +354,12 @@
     display: block;
     background: var(--grey);
     cursor: zoom-in;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .item-img.loaded {
+    opacity: 1;
   }
 
   .item-img-placeholder {
@@ -825,15 +831,27 @@ function showSkeletons(count = 6) {
   `).join('');
 }
 
-// FIXED Welcome Modal
+// FIXED Welcome Modal - Shows immediately, items load in background
 function loadWelcomeMessage() {
+  // Show modal immediately without checking localStorage (for testing)
+  // Change to 'if (seenToday === new Date().toDateString()) return;' for production
   const seenToday = localStorage.getItem('welcomeSeenToday');
-  if (seenToday === new Date().toDateString()) return;
-
+  
   welcomeRef.once('value', (snapshot) => {
     const msg = snapshot.val() || "Karibu bro/sis! Hapa ndio utapata vitu poa bila kuuza kidney yako 😂 Welcome to Kisii Uni Second-Hand!";
-    document.getElementById('welcomeMessage').textContent = msg;
-    document.getElementById('welcomeModal').style.display = 'flex';
+    const modal = document.getElementById('welcomeModal');
+    const messageEl = document.getElementById('welcomeMessage');
+    
+    if (messageEl) messageEl.textContent = msg;
+    if (modal) {
+      modal.style.display = 'flex';
+      // Ensure modal is on top
+      modal.style.zIndex = '9999';
+    }
+    
+    // Start loading items immediately in background
+    // This happens WHILE user reads the welcome message
+    console.log('Welcome modal shown, starting item load in background...');
   });
 }
 
@@ -902,8 +920,8 @@ function loadAndRenderItems() {
       const imgUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
       return `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" onclick="viewImage('${imgUrl}')" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
-        <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}">
+        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" loading="lazy" onclick="viewImage('${imgUrl}')" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" onload="this.style.opacity=1">` : ''}
+        <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}; animation: fadeIn 0.5s ease-in;">
           ${getEmoji(item.category)}
         </div>
         <div class="item-body">
