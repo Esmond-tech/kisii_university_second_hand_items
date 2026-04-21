@@ -717,6 +717,10 @@ function renderAll() {
       const safePhone = sanitize(item.phone || '');
       const safePrice = sanitize(String(item.price || 0));
       const imgUrl = item.image || (item.images && item.images[0]) || '';
+      // Optimize with Cloudinary - use small thumbnails for admin list
+      const optimizedUrl = imgUrl && imgUrl.includes('cloudinary.com') 
+        ? imgUrl.replace('/upload/', '/upload/f_auto,q_auto,w_80,h_80,c_fill/') 
+        : imgUrl;
       const safeKey = sanitize(keys[idx]);
       const isSold = !!item.sold;
       return `
