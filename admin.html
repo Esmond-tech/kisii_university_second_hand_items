@@ -727,7 +727,7 @@ function renderAll() {
       <div class="admin-item" style="${isSold ? 'opacity:0.6;' : ''}" data-key="${safeKey}">
         <input type="checkbox" class="item-checkbox" value="${safeKey}" onchange="updateBulkDeleteButton()" style="width:18px;height:18px;cursor:pointer;margin-right:10px;">
         <div class="admin-item-img">
-          ${imgUrl ? `<img src="${imgUrl}"/>` : getEmoji(item.category)}
+          ${imgUrl ? `<img src="${optimizedUrl}" loading="lazy" decoding="async"/>` : getEmoji(item.category)}
         </div>
         <div class="admin-item-info">
           <div class="admin-item-name">${safeName} ${isSold ? '<span style="color:red">[SOLD]</span>' : ''}</div>
