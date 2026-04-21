@@ -987,11 +987,34 @@ function loadAndRenderItems() {
       const safeName = sanitize(item.name || '');
       const safeCategory = sanitize(item.category || '');
       const waPhone = (item.phone || '').replace(/^0/, '').replace(/[^0-9]/g, '');
-      const imgUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
+      const rawUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
+      
+      // Optimize image URL with Cloudinary transformations
+      let imgUrl = rawUrl;
+      if (rawUrl && rawUrl.includes('cloudinary.com')) {
+        // Add f_auto (auto format), q_auto (auto quality), w_400 (width limit)
+        imgUrl = rawUrl.replace('/upload/', '/upload/f_auto,q_auto,w_400/');
+      }
+      
+      // Create smaller thumbnail for initial load
+      let thumbUrl = '';
+      if (rawUrl && rawUrl.includes('cloudinary.com')) {
+        thumbUrl = rawUrl.replace('/upload/', '/upload/f_auto,q_auto,w_50,h_50,c_thumb/');
+      }
+      
       console.log('Item', idx, ':', safeName, 'Image:', imgUrl ? 'YES' : 'NO');
       return `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" loading="lazy" onclick="viewImage('${imgUrl}')" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" onload="this.classList.add('loaded')">` : ''}
+        ${imgUrl ? `<img class="item-img" 
+          src="${imgUrl}" 
+          alt="${safeName}" 
+          loading="${idx < 6 ? 'eager' : 'lazy'}"
+          fetchpriority="${idx < 3 ? 'high' : 'auto'}"
+          decoding="async"
+          onclick="viewImage('${rawUrl}')" 
+          onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" 
+          onload="this.classList.add('loaded')"
+        >` : ''}
         <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}">
           ${getEmoji(item.category)}
         </div>
