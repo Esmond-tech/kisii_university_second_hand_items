@@ -666,6 +666,41 @@
 </head>
 <body>
 
+<!-- DEBUG PANEL - Shows console logs on page -->
+<div id="debugPanel" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#00ff88;padding:10px;font-family:monospace;font-size:12px;max-height:150px;overflow-y:auto;z-index:10000;border-top:2px solid #00ff88;">
+  <div style="font-weight:bold;margin-bottom:5px;">🔧 DEBUG CONSOLE (Auto-hides in 30s)</div>
+  <div id="debugLogs"></div>
+</div>
+<script>
+// Capture console logs and show on page
+(function() {
+  const debugLogs = document.getElementById('debugLogs');
+  const panel = document.getElementById('debugPanel');
+  const originalLog = console.log;
+  const originalError = console.error;
+  
+  function addLog(type, args) {
+    const div = document.createElement('div');
+    div.style.cssText = type === 'error' ? 'color:#ff6b6b;margin:2px 0;' : 'color:#00ff88;margin:2px 0;';
+    div.textContent = '[' + type.toUpperCase() + '] ' + Array.from(args).join(' ');
+    debugLogs.appendChild(div);
+    debugLogs.scrollTop = debugLogs.scrollHeight;
+  }
+  
+  console.log = function() { addLog('log', arguments); originalLog.apply(console, arguments); };
+  console.error = function() { addLog('error', arguments); originalError.apply(console, arguments); };
+  
+  // Auto-hide after 30 seconds
+  setTimeout(() => { panel.style.display = 'none'; }, 30000);
+  
+  // Capture global errors
+  window.onerror = function(msg, url, line) {
+    addLog('error', ['GLOBAL ERROR:', msg, 'at line', line]);
+    return false;
+  };
+})();
+</script>
+
 <!-- NAV -->
 <nav>
   <div class="logo">KISII UNI<br><span>SECOND-HAND</span></div>
