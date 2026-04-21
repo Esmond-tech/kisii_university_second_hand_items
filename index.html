@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<!-- CSP TEMPORARILY DISABLED FOR TESTING - Firebase CSP issues -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://upload-widget.cloudinary.com https://*.googleapis.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src * https: data: blob:; connect-src 'self' https: wss: https://*.firebasedatabase.app https://*.googleapis.com; frame-src https://upload-widget.cloudinary.com;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kisii Uni Second-Hand Items</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -667,60 +667,6 @@
 <body>
 
 <!-- FIREBASE STATUS CHECK - Shows visible error if Firebase fails -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var statusDiv = document.createElement('div');
-  statusDiv.id = 'firebaseStatus';
-  statusDiv.style.cssText = 'position:fixed;top:60px;left:10px;right:10px;background:#ff6b6b;color:white;padding:15px;z-index:99999;font-family:monospace;font-size:14px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);text-align:center;';
-  statusDiv.innerHTML = '⏳ Loading Firebase...';
-  document.body.appendChild(statusDiv);
-  
-  setTimeout(function() {
-    if (typeof firebase === 'undefined') {
-      statusDiv.innerHTML = '❌ ERROR: Firebase library not loaded!<br>Check internet connection or refresh page.';
-    } else {
-      try {
-        var app = firebase.app();
-        statusDiv.style.background = '#1a7a3c';
-        statusDiv.innerHTML = '✅ Firebase loaded: ' + app.name;
-        setTimeout(function() { statusDiv.style.display = 'none'; }, 2000);
-      } catch(e) {
-        statusDiv.innerHTML = '❌ Firebase error: ' + e.message;
-      }
-    }
-  }, 3000);
-});
-</script>
-
-<!-- DEBUG PANEL -->
-<div id="debugPanel" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#00ff88;padding:10px;font-family:monospace;font-size:11px;max-height:120px;overflow-y:auto;z-index:10000;border-top:2px solid #00ff88;">
-  <div style="font-weight:bold;margin-bottom:5px;">🔧 DEBUG CONSOLE</div>
-  <div id="debugLogs"></div>
-</div>
-<script>
-(function() {
-  var debugLogs = document.getElementById('debugLogs');
-  var originalLog = console.log;
-  var originalError = console.error;
-  
-  function addLog(type, args) {
-    var div = document.createElement('div');
-    div.style.cssText = type === 'error' ? 'color:#ff6b6b;margin:1px 0;' : 'color:#00ff88;margin:1px 0;word-break:break-all;';
-    div.textContent = '[' + type + '] ' + Array.from(args).join(' ').substring(0, 300);
-    debugLogs.appendChild(div);
-  }
-  
-  console.log = function() { addLog('LOG', arguments); originalLog.apply(console, arguments); };
-  console.error = function() { addLog('ERR', arguments); originalError.apply(console, arguments); };
-  
-  window.onerror = function(msg, url, line) {
-    addLog('ERR', ['GLOBAL:', msg, 'Line:', line]);
-  };
-  
-  console.log('Debug initialized');
-})();
-</script>
-
 <!-- NAV -->
 <nav>
   <div class="logo">KISII UNI<br><span>SECOND-HAND</span></div>
