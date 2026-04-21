@@ -355,11 +355,21 @@
     background: var(--grey);
     cursor: zoom-in;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in;
   }
 
   .item-img.loaded {
     opacity: 1;
+  }
+
+  .item-img-placeholder {
+    width: 100%;
+    height: 185px;
+    background: var(--grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
   }
 
   .item-img-placeholder {
@@ -893,10 +903,23 @@ function loadAndRenderItems() {
   const countEl = document.getElementById('itemsCount');
 
   showSkeletons(6);
+  
+  // Check if itemsRef is defined
+  if (typeof itemsRef === 'undefined' || !itemsRef) {
+    console.error('Firebase not initialized');
+    grid.innerHTML = `<div class="empty-state">
+      <div class="big-emoji">⚠️</div>
+      <h3>Hitilafu ya mtandao</h3>
+      <p>Tafadhali refresh page au jaribu tena baadaye</p>
+    </div>`;
+    return;
+  }
 
   itemsRef.once('value', (snapshot) => {
     let items = [];
-    snapshot.forEach((child) => { items.push(child.val()); });
+    snapshot.forEach((child) => { items.push({...child.val(), id: child.key}); });
+    
+    console.log('Fetched items:', items.length);
 
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
@@ -922,8 +945,8 @@ function loadAndRenderItems() {
       const imgUrl = (item.images && item.images[0]) ? item.images[0] : (item.image ? item.image : '');
       return `
       <div class="item-card" style="animation-delay:${idx * 0.05}s">
-        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" loading="lazy" onclick="viewImage('${imgUrl}')" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" onload="this.style.opacity=1">` : ''}
-        <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}; animation: fadeIn 0.5s ease-in;">
+        ${imgUrl ? `<img class="item-img" src="${imgUrl}" alt="${safeName}" loading="lazy" onclick="viewImage('${imgUrl}')" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'" onload="this.classList.add('loaded')">` : ''}
+        <div class="item-img-placeholder" style="${imgUrl ? 'display:none' : 'display:flex'}">
           ${getEmoji(item.category)}
         </div>
         <div class="item-body">
