@@ -251,6 +251,32 @@
 
   .post-btn:hover { opacity: 0.88; }
 
+  /* ── FAB ── */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(26, 122, 60, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 1000;
+  }
+
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(26, 122, 60, 0.4);
+  }
+
   /* ── CATEGORIES ── */
   .categories-section {
     padding: 24px 24px 0;
@@ -404,9 +430,19 @@
     color: var(--text);
   }
 
+  .trust-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   .item-price {
-    font-size: 1.18rem;
-    font-weight: 800;
+    font-size: 1.25rem;
+    font-weight: 900;
     color: var(--red);
     margin-bottom: 14px;
     letter-spacing: -0.01em;
@@ -660,7 +696,8 @@
     .items-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .item-img, .item-img-placeholder, .skeleton-img { height: 140px; }
     .sticky-controls { padding: 10px 14px; gap: 8px; }
-    .sticky-post-btn span { display: none; }
+    .sticky-post-btn { display: none; }
+    .fab { display: flex; }
   }
 </style>
 </head>
@@ -706,6 +743,11 @@
 
 <div class="post-btn-wrap">
   <button class="post-btn" onclick="document.getElementById('postModal').style.display='flex'"> ➕ </button>
+</div>
+
+<!-- Floating Action Button for Mobile -->
+<div class="fab" onclick="document.getElementById('postModal').style.display='flex'">
+  <span>➕</span>
 </div>
 
 <div class="categories-section">
@@ -997,7 +1039,7 @@ function loadAndRenderItems() {
       let imgUrl = rawUrl;
       if (rawUrl && rawUrl.includes('cloudinary.com')) {
         // Add f_auto (auto format), q_auto (auto quality), w_400 (width limit)
-        imgUrl = rawUrl.replace('/upload/', '/upload/f_auto,q_auto,w_400/');
+        imgUrl = rawUrl.replace('/upload/', '/upload/f_auto,q_auto,w_500/');
       }
       
       // Create smaller thumbnail for initial load
@@ -1025,6 +1067,7 @@ function loadAndRenderItems() {
         <div class="item-body">
           <div class="item-category">${safeCategory}</div>
           <div class="item-name">${safeName}</div>
+          <div class="trust-badge">✓ Verified Student Seller</div>
           <div class="item-price">KSh ${Number(item.price).toLocaleString()}<span>${item.negotiable ? 'negotiable' : ''}</span></div>
           <a class="contact-btn" href="https://wa.me/254${waPhone}?text=Niambie%20zaidi%20kuhusu%20${encodeURIComponent(item.name)}" target="_blank">
             📲 Wasiliana na Seller
