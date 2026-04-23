@@ -826,6 +826,11 @@ function sanitize(str) {
 
 let activeCategory = 'All';
 
+function getInputValue(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.toLowerCase().trim() : '';
+}
+
 // ── SKELETON LOADING ──
 function showSkeletons(count = 6) {
   const grid = document.getElementById('itemsGrid');
@@ -899,8 +904,7 @@ function renderCategories() {
 
 function loadAndRenderItems() {
   console.log('=== loadAndRenderItems() STARTED ===');
-  const query = document.getElementById('searchInput').value.toLowerCase().trim()
-    || document.getElementById('searchInputSticky').value.toLowerCase().trim();
+  const query = getInputValue('searchInput') || getInputValue('searchInputSticky');
   const grid = document.getElementById('itemsGrid');
   const countEl = document.getElementById('itemsCount');
 
@@ -1048,12 +1052,20 @@ function setCategory(cat) {
 }
 
 function filterItems() {
-  document.getElementById('searchInputSticky').value = document.getElementById('searchInput').value;
+  const searchInput = document.getElementById('searchInput');
+  const searchInputSticky = document.getElementById('searchInputSticky');
+  if (searchInput && searchInputSticky) {
+    searchInputSticky.value = searchInput.value;
+  }
   loadAndRenderItems();
 }
 
 function filterItemsSticky() {
-  document.getElementById('searchInput').value = document.getElementById('searchInputSticky').value;
+  const searchInput = document.getElementById('searchInput');
+  const searchInputSticky = document.getElementById('searchInputSticky');
+  if (searchInput && searchInputSticky) {
+    searchInput.value = searchInputSticky.value;
+  }
   loadAndRenderItems();
 }
 
@@ -1148,11 +1160,25 @@ function showPageToast(msg) {
   setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 3000);
 }
 
-itemsRef.on('value', () => { loadAndRenderItems(); });
+function initApp() {
+  renderCategories();
+  showSkeletons(6);
+  loadWelcomeMessage();
 
-renderCategories();
-loadAndRenderItems();
-loadWelcomeMessage();
+  if (window.firebase && firebase.database) {
+    itemsRef.on('value', loadAndRenderItems);
+    loadAndRenderItems();
+    incrementVisitorCount();
+  } else {
+    console.error('Firebase library failed to load.');
+    const grid = document.getElementById('itemsGrid');
+    if (grid) {
+      grid.innerHTML = `<div class="empty-state"><div class="big-emoji">⚠️</div><h3>Firebase failed to load</h3><p>Check your internet connection and browser console.</p></div>`;
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded', initApp);
 
 function incrementVisitorCount() {
   const now = new Date();
@@ -1169,8 +1195,6 @@ function incrementVisitorCount() {
 
   localStorage.setItem(lastVisitKey, '1');
 }
-
-incrementVisitorCount();
 </script>
 </body>
 </html>
