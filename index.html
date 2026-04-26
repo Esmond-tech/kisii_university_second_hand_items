@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; script-src-elem 'self' 'unsafe-inline' https:; script-src-attr 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https:; font-src https:; img-src 'self' https: data: blob:; connect-src 'self' https: wss:; frame-src https:;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: https://www.gstatic.com https://upload-widget.cloudinary.com; script-src-elem 'self' 'unsafe-inline' https:; script-src-attr 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https:; font-src https:; img-src 'self' https: data: blob: https://res.cloudinary.com https://*.cloudinary.com; connect-src 'self' https: wss: https://*.firebaseio.com https://*.firebasestorage.app; frame-src https:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Kisii Uni Second-Hand Items</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -1009,6 +1009,7 @@ function loadAndRenderItems() {
     
     console.log('Items fetched:', items.length);
 
+
     if (activeCategory !== 'All') {
       items = items.filter(i => i.category === activeCategory);
     }
@@ -1018,12 +1019,24 @@ function loadAndRenderItems() {
         (i.category && i.category.toLowerCase().includes(query))
       );
     }
+    // Sort by createdAt descending (newest first), fallback to addedAt or 0
+    items.sort((a, b) => {
+      const getTime = (item) => {
+        if (item.createdAt) return item.createdAt;
+        if (item.addedAt) {
+          const t = Date.parse(item.addedAt);
+          return isNaN(t) ? 0 : t;
+        }
+        return 0;
+      };
+      return getTime(b) - getTime(a);
+    });
 
     countEl.innerHTML = `<strong>${items.length}</strong> item${items.length !== 1 ? 's' : ''} found`;
 
     if (items.length === 0) {
       console.log('No items after filtering');
-      grid.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>Hakuna items kwa sasa</h3><p>Try different category au search tena baadaye</p></div>`;
+      grid.innerHTML = `<div class="empty-state"><div class="big-emoji">🔍</div><h3>Bado hatujapata hiyo!</h3><p>Try a different search or category.</p></div>`;
       return;
     }
 
@@ -1175,6 +1188,7 @@ function submitPostItem() {
     images: postImages.length ? postImages : null,
     negotiable: false,
     addedAt: new Date().toISOString(),
+    createdAt: Date.now(),
     postedBy: 'public'
   };
 
